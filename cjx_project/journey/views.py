@@ -32,6 +32,11 @@ import json
 def importTouchpoint(request):
     all_fields = {}
     matching_reports = [report for report in Matching_Report.objects.all()]
+    matched_columns = [{   'report_name'       : column.report.name, 
+                            'report_column'     : column.report_column, 
+                            'journey_column'    : column.journey_column, 
+                            'function'          : column.function
+                            } for column in Matching_Column.objects.all()]
 
     for field in Touchpoint._meta.get_fields():
         if (field.name != "id" and field.name != "record_time"):
@@ -47,8 +52,13 @@ def importTouchpoint(request):
 
             all_fields[field.name] = converted_type
 
-    return render(request, "journey/import-touchpoint.html", {"allFields": all_fields, "matchingReports": matching_reports})
+    return render(request, "journey/import-touchpoint.html", {"allFields": all_fields, "matchingReports": matching_reports, "matchedColumns": matched_columns})
 
+@user_passes_test(lambda user: user.is_staff, login_url="/admin")
+def readInstruction(request):
+    matching_reports = [report for report in Matching_Report.objects.all()]
+
+    return render(request, "journey/read-instruction.html", {"matchingReports": matching_reports})
 
 @user_passes_test(lambda user: user.is_staff, login_url="/admin")
 def exportTouchpoint(request):
@@ -59,13 +69,12 @@ def uploadTouchpoint(request):
     if request.method == "POST":
         body = json.loads(request.body)
         touchpoints = body["data"]
-        match_columns = body["matchColumns"]
         new_touchpoints = []
 
         for touchpoint in touchpoints:
             new_touchpoint = Touchpoint()
-            for key in match_columns:
-                value = touchpoint[match_columns[key]]
+            for key in touchpoint:
+                value = touchpoint[key]
                 if key == "action_type":
                     new_value = get_or_none(Action_Type, value, key)
                 elif key == "source_name":
@@ -97,7 +106,6 @@ def uploadTouchpoint(request):
         return JsonResponse({"result": "Import Successfully"})
 
 def get_or_none(classmodel, name, column):
-    print(name)
     try:
         return classmodel.objects.get(name=name)
     except classmodel.MultipleObjectsReturned:
@@ -112,10 +120,10 @@ def get_or_none(classmodel, name, column):
 
 
 @user_passes_test(lambda user: user.is_staff, login_url="/admin")
-def readInstruction(request, datasrc):
+def readDataSrcInstruction(request, datasrc):
     listMatchingFields = [[row.report_column, row.journey_column, row.function] for row in Matching_Column.objects.filter(report__name=datasrc)]
     instruction_img = Matching_Report.objects.get(name=datasrc).instruction_link
-    return render(request, "journey/read-instruction.html", {'dataSrc': datasrc.upper(), 'listMatchingFields': listMatchingFields, 'instructionImg': instruction_img})
+    return render(request, "journey/read-detail-instruction.html", {'dataSrc': datasrc.upper(), 'listMatchingFields': listMatchingFields, 'instructionImg': instruction_img})
 
 
 @user_passes_test(lambda user: user.is_staff, login_url="/admin")

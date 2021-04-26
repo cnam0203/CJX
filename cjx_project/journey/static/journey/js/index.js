@@ -1,11 +1,14 @@
 var importData = [];
 var matchColumns = {};
 var table = document.getElementById('tbl-csv-data');
+var mappingTypeDiv = document.getElementById('select-mapping-type');
 var submitBtn = document.getElementById("submit-file");
-var instructionSelect = document.getElementById("instruction");
 var touchpointFields = {};
+var matchedColumns = [];
+var headers = [];
+var sendData =[];
 
-instructionSelect.addEventListener('change', readInstruction);
+
 
 function isNumeric(str) {
     if (typeof str != "string") return false // we only process strings!  
@@ -17,12 +20,18 @@ function isDate(dateStr) {
     return !isNaN(new Date(dateStr).getDate());
 }
 
-function importFile(allFields) {
+function importFile(allFields, allMatchedColumns) {
     refreshUpload();
+
+    mappingTypeDiv.style.display = "block";
     submitBtn.style.display = "inline-block";
+
     var inputFile = document.getElementById('upload-csv').files[0];
+    var report = document.getElementById('report');
+
     touchpointFields = allFields;
-    console.log(touchpointFields);
+    matchedColumns = allMatchedColumns;
+    report.value = '';
 
     if (checkCSVFile(inputFile)) 
         importCSV(inputFile)
@@ -35,17 +44,22 @@ function importCSV(inputFile) {
         download: true,
         header: true,
         complete: function(results) {
-            var headers = results.meta.fields;
+            headers = results.meta.fields;
             importData = results.data;
 
-            generateTableHeadSelectors(table, headers);
-            generateTableHead(table, headers, true);
-
-            results.data.map((data)=> {
-                generateTableRows(table, headers, data);
-            }); 
+            generateTable(headers, importData);
         }
     });
+}
+
+function generateTable(headerNames, datas) {
+    table.innerHTML = '';
+
+    generateTableHead(headerNames, true);
+
+    datas.map((data)=> {
+        generateTableRows(headerNames, data);
+    }); 
 }
 
 function importJSON(inputFile) {
@@ -78,7 +92,6 @@ function importJSON(inputFile) {
 
 function checkCSVFile(file) {
     var fileExtension = file.name.split('.').pop();
-    console.log(fileExtension);
     if (fileExtension === "csv") 
         return true;
     return false;
@@ -87,8 +100,11 @@ function checkCSVFile(file) {
 function refreshUpload() {
     importData = [];
     matchColumns = {};
+    sendData = [];
+    headers = [];
     table.innerHTML = '';
     submitBtn.style.display = 'none';
+    mappingTypeDiv.style.display = 'none';
 }
 
 function generateCSVData(importData, keys, data) {
@@ -183,9 +199,12 @@ function changeHeaderBackgroundColor(headerName, color, backgroundColor) {
     header.style.color = color;
 }
 
-function generateTableHeadSelectors(table, headers) {
+function generateTableHeadSelectors() {
     let thead = table.createTHead();
     let row = thead.insertRow();
+
+    row.setAttribute("id", "header-selectors");
+
     for (var i = 0; i < headers.length; i++) {
         let th = document.createElement('th');
         th.style.textAlign = "center";
@@ -219,11 +238,10 @@ function generateTableHeadSelectors(table, headers) {
     }
 }
 
-function generateTableHead(table, headers, isCsv) {
-    let thead = table.createTHead();
-    let row = thead.insertRow();
+function generateTableHead(headerNames, isCsv) {
+    let row = table.insertRow();
 
-    for (let field of headers) {
+    for (let field of headerNames) {
         let th = document.createElement('th');
         th.setAttribute('id', 'header_' + field);
         th.style.textAlign = "center";
@@ -236,9 +254,9 @@ function generateTableHead(table, headers, isCsv) {
     }
 }
 
-function generateTableRows(table, headers, data) {
-    let newRow = table.insertRow(-1);
-    for(let field of headers) {
+function generateTableRows(headerNames, data) {
+    let newRow = table.insertRow();
+    for(let field of headerNames) {
     	let newCell = newRow.insertCell();
         let txt = data[field] ? data[field] : null;
     	let newText = document.createTextNode(txt);
@@ -246,6 +264,7 @@ function generateTableRows(table, headers, data) {
     	newCell.appendChild(newText);
         newCell.style.textAlign = "center";
         newCell.style.border = "1px solid #000000";
+
     }
 }
 
@@ -276,36 +295,53 @@ function isEmpty(obj) {
 }
 
 function submitTouchpoint() {
-    if (Object.keys(matchColumns).length == 0) 
-        alert("No data to import!");
-    else {
-        const csrftoken = getCookie('csrftoken');
-        fetch('/admin/journey/upload-touchpoint', {
-            method: 'post',
-            mode: 'same-origin',
-            headers: {
-              "Accept": 'application/json',
-              "Content-type": 'application/json',
-              'X-CSRFToken': csrftoken,
-            },
-            body: JSON.stringify({data: importData, matchColumns: matchColumns})
-          })
-          .then(function (response) {
-                return response.json();
-          })
-          .then(function (data) {
-                alert(data.result);
-                location.reload();
-          })
-          .catch(function (error) {
-                alert(error);
-                location.reload();
-          });
+    if (Object.keys(matchColumns).length != 0) {
+        sendData = [];
+
+        for (data of importData) {
+            var validData = {};
+
+            for (key in matchColumns) {
+                validData[key] = data[matchColumns[key]];
+            }
+
+            sendData.push(validData);
+        }
     }
+
+    console.log(sendData);
+
+    if (sendData.length == 0) {
+        alert('No data to import')
+        return;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+    fetch('/admin/journey/upload-touchpoint', {
+        method: 'post',
+        mode: 'same-origin',
+        headers: {
+            "Accept": 'application/json',
+            "Content-type": 'application/json',
+            'X-CSRFToken': csrftoken,
+        },
+        body: JSON.stringify({data: sendData})
+        })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            alert(data.result);
+            location.reload();
+        })
+        .catch(function (error) {
+            alert(error);
+            location.reload();
+        });
 }
 
-function readInstruction(e) {
-    var dataSrc = e.target.value;
+function readInstruction(selectObj) {
+    var dataSrc = selectObj.value;
 
     if (dataSrc != '') {
         window.location.href = '/admin/journey/read-instruction/' + dataSrc;
@@ -386,4 +422,90 @@ function submitMappingFile(reports, journeyColumns) {
             alert(error);
             location.reload();
         });
+}
+
+function mapFile(selectObj) {
+    matchColumns = {};
+    sendData = [];
+
+    var dataSrc = selectObj.value;
+
+    if (dataSrc == 'manipulate') {
+        generateTable(headers, importData);
+        generateTableHeadSelectors();
+    } else if (dataSrc == '') {
+        generateTable(headers, importData);
+    } else {
+        var dataSrcMatchColumns = matchedColumns.filter((row) => {
+            if (row.report_name == dataSrc)
+                return true;
+            else
+                return false;
+        })
+
+        generateMatchedData(dataSrcMatchColumns);
+
+        if (sendData.length > 0) {
+            var matchHeaders = dataSrcMatchColumns.map((row) => {
+                return row.journey_column;
+            })
+
+            generateTable(matchHeaders, sendData);
+        }
+    }
+}
+
+function generateMatchedData(dataSrcMatchColumns) {
+    for (let row of dataSrcMatchColumns) {
+        if (!headers.includes(row.report_column)) {
+            alert("Import File not exist " + row.report_column + " field");
+            return;
+        }
+    }
+
+    for (let i=0; i < importData.length; i++) {
+        validData = {};
+
+        for (let row of dataSrcMatchColumns) {
+            var data = importData[i][row.report_column];
+            var checkDataType = true;
+
+            data = convertDataType(row.function, data);
+            
+            if (touchpointFields[row.journey_column] == 'numeric' && !isNumeric(data)) {
+                checkDataType = false
+            } else if (touchpointFields[row.journey_column] == 'date' && !isDate(data)) {
+                checkDataType = false;
+            }
+    
+            if (checkDataType == false) {
+                sendData = [];
+                var message = 'At row ' + i.toString() + ',' + 'cannot match ' + row.report_column + ' to ' + row.journey_column;
+                alert(message);
+
+                return [];
+            }
+
+            validData[row.journey_column] = data;
+        }
+
+        sendData.push(validData);
+    }
+}
+
+function convertDataType(functionName, data) {
+    if (functionName == 'lower') 
+        data = data.toLowerCase()
+    else if (functionName == 'upper')
+        data = data.toUpperCase()
+    else if (functionName == 'datetime')
+        data = new Date(data)
+    else if (functionName == 'string')
+        data = data.toString()
+    else if (functionName == 'int')
+        data = parseInt(data)
+    else if (functionName == 'float')
+        data = parseFloat(data)
+
+    return data
 }

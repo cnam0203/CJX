@@ -102,11 +102,11 @@ class Touchpoint(models.Model):
         #figure out warranty end date
         if Journey_Customer.objects.filter(customerID=self.customer_id).exists() == False:
             Journey_Customer.objects.create(customerID=self.customer_id, register_date=self.visit_time)
-        else:
-            journey_customer = Journey_Customer.objects.get(customerID=self.customer_id)
-            if (journey_customer.register_date > self.visit_time):
-                journey_customer.register_date = self.visit_time
-                journey_customer.save()
+        # else:
+        #     journey_customer = Journey_Customer.objects.get(customerID=self.customer_id)
+        #     if (journey_customer.register_date > self.visit_time):
+        #         journey_customer.register_date = self.visit_time
+        #         journey_customer.save()
         super(Touchpoint, self).save()
 
 
@@ -119,7 +119,7 @@ class Matching_Report(models.Model):
         return str(self.name)
 
 class Matching_Column(models.Model):
-    functions = [(function, function) for function in ['lower', 'upper', 'datetime']]
+    functions = [(function, function) for function in ['lower', 'upper', 'datetime', 'string', 'int', 'float']]
     report = models.ForeignKey(Matching_Report, blank=False, null=True, on_delete=models.SET_NULL)
     journey_column = models.CharField(max_length=50, blank=False, null=True)
     report_column = models.CharField(max_length=50, blank=True, null=True)

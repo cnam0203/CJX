@@ -7,5 +7,6 @@ urlpatterns = [
     path('import-touchpoint', views.importTouchpoint),
     path('export-touchpoint', views.exportTouchpoint),
     path('upload-touchpoint', views.uploadTouchpoint),
-    path('read-instruction/<datasrc>', views.readInstruction),
+    path('read-instruction/<datasrc>', views.readDataSrcInstruction),
+    path('read-instruction', views.readInstruction),
 ]

@@ -5,22 +5,25 @@
             <h1>Customer Experience Management</h1>
             <h2>IMPORT DATA</h2>
             <br/>
-            <br/>
-            <label>INSTRUCTION FOR MATCHING: </label>
-            <select id='instruction' name='instruction'>
-                <option value=''>Select Data Source</option>
-                {% for report in matchingReports%}
-                    <option value= {{ report.name }}>{{ report.name }}</option>
-                {% endfor %}
-            </select>
-            <br/>
             <label>UPLOAD CSV/JSON FILE: </label>
             <input type="file" 
                     id="upload-csv" 
                     accept=".csv, .json" 
                     style="width: 86px"
-                    onchange="importFile({{ allFields }});"
+                    onchange="importFile({{ allFields }}, {{ matchedColumns }});"
             />
+            <br/>
+            <br/>
+            <div id="select-mapping-type" style="display: none">
+                <label>CHOOSE MAPPING TYPE: </label>
+                <select id='report' name='report' onchange='mapFile(this)'>
+                    <option value=''>Select Mapping Type</option>
+                    {% for report in matchingReports%}
+                        <option value= {{ report.name }}>{{ report.name }}</option>
+                    {% endfor %}
+                    <option value='manipulate'>manipulate</option>
+                </select>
+            </div>
             <br/>
             <br/>
             <input type="submit" 
