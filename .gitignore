@@ -127,3 +127,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# CJX
+**/migrations
+*.DS_Store
+**/__pycache__
+**/.DS_Store
+
+*.png
+*.sav
