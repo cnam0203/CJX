@@ -26,7 +26,11 @@ from .models import Matching_Report
 from .models import Matching_Column
 
 import json
+import os
+
+from utils.path_helper import get_static_path
 # Create your views here.
+
 
 
 @user_passes_test(lambda user: user.is_staff, login_url="/admin")
@@ -149,19 +153,19 @@ def upload_mapping_file(request):
         matching_columns = json.loads(request.POST.get('matchingColumns'))
         files = request.FILES.getlist('files[]')
 
-        staticPath = ''
+        link_url = ''
 
         if (len(files) > 0):
             instructionImg = files[0]
-            filename = '/journey/instructions/' + \
-                str(datetime.now().timestamp()) + ".png"
-            path = "journey/static" + filename
-            staticPath = '/static' + filename
 
-            handle_uploaded_file(instructionImg, path)
+            filename = 'journey/instructions/' + str(datetime.now().timestamp()) + ".png"
+
+            (static_path, link_url) = get_static_path(filename, 'journey')
+
+            handle_uploaded_file(instructionImg, static_path)
 
         new_report = Matching_Report.objects.create(
-            name=data_source, instruction_link=staticPath)
+            name=data_source, instruction_link=link_url)
         new_report.save()
 
         for column in matching_columns:

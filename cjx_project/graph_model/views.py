@@ -34,6 +34,7 @@ from pm4py.visualization.process_tree import visualizer as pt_visualizer
 from pm4py.visualization.heuristics_net import visualizer as hn_visualizer
 from pm4py.visualization.dfg import visualizer as dfg_visualization
 
+from utils.path_helper import get_static_path
 # Create your views here.
 
 
@@ -283,7 +284,7 @@ def process_mining(touchpoints, type):
     gviz = None
 
     if type == "alpha":
-        gviz = alpha_miner(log)
+        gviz = alpha_miner_algo(log)
     elif type == "heuristic-heu-net":
         gviz = heuristic_miner_heu_net(log)
     elif type == "heuristic-pet-net":
@@ -300,7 +301,7 @@ def process_mining(touchpoints, type):
     return gviz
 
 
-def alpha_miner(log):
+def alpha_miner_algo(log):
     # alpha miner
     net, initial_marking, final_marking = alpha_miner.apply(log)
     gviz = pn_visualizer.apply(net, initial_marking, final_marking)
@@ -373,11 +374,12 @@ def predict_journey_cluster(algorithm, x_data, clusterModelFile):
 def save_process_graph(gviz, startDate, endDate, type):
     filename = '/graph_model/journeyProcessGraph/' + \
         str(datetime.now().timestamp()) + ".png"
-    path = "graph_model/static" + filename
-    staticPath = '/static' + filename
-    save_graph_file(type, gviz, path)
+
+    (static_path, link_url) = get_static_path(filename, 'graph_model')
+    save_graph_file(type, gviz, static_path)
+
     newGraph = Journey_Process_Graph.objects.create(runDate=datetime.now(
-    ), startDate=startDate, endDate=endDate, type=type, link=staticPath)
+    ), startDate=startDate, endDate=endDate, type=type, link=link_url)
     newGraph.save()
 
     return filename
@@ -386,11 +388,13 @@ def save_process_graph(gviz, startDate, endDate, type):
 def save_cluster_graph(gviz, clusterID, clusterNumber, type, clusterName=None):
     filename = '/graph_model/journeyClusterGraph/' + \
         str(datetime.now().timestamp()) + ".png"
-    path = "graph_model/static" + filename
-    staticPath = '/static' + filename
-    save_graph_file(type, gviz, path)
+
+    (static_path, link_url) = get_static_path(filename, 'graph_model')
+    save_graph_file(type, gviz, static_path)
+
+    save_graph_file(type, gviz, static_path)
     newGraph = Clustered_Journey_Graph.objects.create(
-        clusterID=clusterID, clusterNumber=clusterNumber, clusterName=clusterName, type=type, link=staticPath)
+        clusterID=clusterID, clusterNumber=clusterNumber, clusterName=clusterName, type=type, link=link_url)
     newGraph.save()
 
     return filename
@@ -416,7 +420,10 @@ def save_graph_file(type, gviz, path):
 def save_cluster_model(startDate, endDate, algorithm, preprocess, numClusters,  clusterModel, preprocessModel=None, accuracy=0):
     filename = '/graph_model/journeyClusterModel/' + \
         str(datetime.now().timestamp()) + ".sav"
-    path = "graph_model/static" + filename
+    
+    (static_path, link_url) = get_static_path(filename, 'graph_model')
+    save_graph_file(type, gviz, static_path)
+
     joblib.dump(clusterModel, path)
 
     newModel = Journey_Cluster_Model.objects.create(startDate=startDate,
@@ -424,10 +431,10 @@ def save_cluster_model(startDate, endDate, algorithm, preprocess, numClusters,  
                                                     algorithm=algorithm,
                                                     preprocessing=preprocess,
                                                     numberClusters=numClusters,
-                                                    clusterModelFile=path, preprocessingModelFile='', accuracy=accuracy)
+                                                    clusterModelFile=static_path, preprocessingModelFile='', accuracy=accuracy)
 
     newModel.save()
-    return newModel.id, path
+    return newModel.id, static_path
 
 
 def save_clustered_user(userID, startJourneyDate, endJourneyDate, journey, cluster_number_id):
