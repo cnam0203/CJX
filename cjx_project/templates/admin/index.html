@@ -26,6 +26,7 @@
         <ul>
             {% if request.user|has_group:"sale_staff" %}
                 <li><a href="journey/create-mapping-file">Create Mapping File</a></li>
+                <li><a href="journey/read-instruction">Read Mapping Instruction</a></li>
                 <li><a href="journey/import-touchpoint">Import Data</a></li>
             {% elif request.user|has_group:"marketing_analyst_staff" %}
                 <li><a href="graph_model/get-visualize-graph-page">Visualize Journey</a></li>

@@ -1,28 +1,27 @@
 var importData = [];
+var matchedColumns = [];
+var headers = [];
+var sendData =[];
+
 var matchColumns = {};
-var table = document.getElementById('tbl-csv-data');
-var submitBtn = document.getElementById("submit-file");
-var instructionSelect = document.getElementById("instruction");
 var touchpointFields = {};
 
-instructionSelect.addEventListener('change', readInstruction);
+var table = document.getElementById('tbl-csv-data');
+var mappingTypeDiv = document.getElementById('select-mapping-type');
+var submitBtn = document.getElementById("submit-file");
 
-function isNumeric(str) {
-    if (typeof str != "string") return false // we only process strings!  
-    return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
-           !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
-}
-
-function isDate(dateStr) {
-    return !isNaN(new Date(dateStr).getDate());
-}
-
-function importFile(allFields) {
+function importFile(allFields, allMatchedColumns) {
     refreshUpload();
-    submitBtn.style.display = "inline-block";
+
     var inputFile = document.getElementById('upload-csv').files[0];
+    var report = document.getElementById('report');
+
+    mappingTypeDiv.style.display = "block";
+    submitBtn.style.display = "inline-block";
+
     touchpointFields = allFields;
-    console.log(touchpointFields);
+    matchedColumns = allMatchedColumns;
+    report.value = '';
 
     if (checkCSVFile(inputFile)) 
         importCSV(inputFile)
@@ -35,17 +34,21 @@ function importCSV(inputFile) {
         download: true,
         header: true,
         complete: function(results) {
-            var headers = results.meta.fields;
+            headers = results.meta.fields;
             importData = results.data;
-
-            generateTableHeadSelectors(table, headers);
-            generateTableHead(table, headers, true);
-
-            results.data.map((data)=> {
-                generateTableRows(table, headers, data);
-            }); 
+            generateTable(headers, importData);
         }
     });
+}
+
+function generateTable(headerNames, datas) {
+    table.innerHTML = '';
+
+    generateTableHead(headerNames, true);
+
+    datas.map((data)=> {
+        generateTableRows(headerNames, data);
+    }); 
 }
 
 function importJSON(inputFile) {
@@ -78,7 +81,6 @@ function importJSON(inputFile) {
 
 function checkCSVFile(file) {
     var fileExtension = file.name.split('.').pop();
-    console.log(fileExtension);
     if (fileExtension === "csv") 
         return true;
     return false;
@@ -87,15 +89,12 @@ function checkCSVFile(file) {
 function refreshUpload() {
     importData = [];
     matchColumns = {};
+    sendData = [];
+    headers = [];
+
     table.innerHTML = '';
     submitBtn.style.display = 'none';
-}
-
-function generateCSVData(importData, keys, data) {
-    var newData = {};
-
-    keys.map(field => { newData[field] = data[field] ? data[field] : null; })
-    importData.push(newData);
+    mappingTypeDiv.style.display = 'none';
 }
 
 function generateJSONData(results) {
@@ -143,10 +142,11 @@ function matchColumn(e) {
     
     for (let field in matchColumns) {
         if (targetColumn == field) {
-            alert('Duplicate matching column');
             e.target.value = 'None';
             changeHeaderBackgroundColor(currentColumn, '#666', '#f8f8f8');
-            return
+            alert('Duplicate matching column');
+
+            return;
         }
     }
 
@@ -162,9 +162,11 @@ function matchColumn(e) {
 
         if (checkDataType == false) {
             var message = 'At row ' + i.toString() + ', data type is invalid, match column data type must be ' + touchpointFields[targetColumn];
-            alert(message);
+
             e.target.value = 'None';
             changeHeaderBackgroundColor(currentColumn, '#666', '#f8f8f8');
+            alert(message);
+
             return
         }
     }
@@ -183,9 +185,12 @@ function changeHeaderBackgroundColor(headerName, color, backgroundColor) {
     header.style.color = color;
 }
 
-function generateTableHeadSelectors(table, headers) {
+function generateTableHeadSelectors() {
     let thead = table.createTHead();
     let row = thead.insertRow();
+
+    row.setAttribute("id", "header-selectors");
+
     for (var i = 0; i < headers.length; i++) {
         let th = document.createElement('th');
         th.style.textAlign = "center";
@@ -219,11 +224,10 @@ function generateTableHeadSelectors(table, headers) {
     }
 }
 
-function generateTableHead(table, headers, isCsv) {
-    let thead = table.createTHead();
-    let row = thead.insertRow();
+function generateTableHead(headerNames, isCsv) {
+    let row = table.insertRow();
 
-    for (let field of headers) {
+    for (let field of headerNames) {
         let th = document.createElement('th');
         th.setAttribute('id', 'header_' + field);
         th.style.textAlign = "center";
@@ -236,9 +240,9 @@ function generateTableHead(table, headers, isCsv) {
     }
 }
 
-function generateTableRows(table, headers, data) {
-    let newRow = table.insertRow(-1);
-    for(let field of headers) {
+function generateTableRows(headerNames, data) {
+    let newRow = table.insertRow();
+    for(let field of headerNames) {
     	let newCell = newRow.insertCell();
         let txt = data[field] ? data[field] : null;
     	let newText = document.createTextNode(txt);
@@ -246,134 +250,40 @@ function generateTableRows(table, headers, data) {
     	newCell.appendChild(newText);
         newCell.style.textAlign = "center";
         newCell.style.border = "1px solid #000000";
+
     }
-}
-
-function showMessage(message, time) {
-    setTimeout(function() {
-        alert(message);
-    }, time);
-}
-
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-function isEmpty(obj) {
-    return Object.keys(obj).length === 0;
 }
 
 function submitTouchpoint() {
-    if (Object.keys(matchColumns).length == 0) 
-        alert("No data to import!");
-    else {
-        const csrftoken = getCookie('csrftoken');
-        fetch('/admin/journey/upload-touchpoint', {
-            method: 'post',
-            mode: 'same-origin',
-            headers: {
-              "Accept": 'application/json',
-              "Content-type": 'application/json',
-              'X-CSRFToken': csrftoken,
-            },
-            body: JSON.stringify({data: importData, matchColumns: matchColumns})
-          })
-          .then(function (response) {
-                return response.json();
-          })
-          .then(function (data) {
-                alert(data.result);
-                location.reload();
-          })
-          .catch(function (error) {
-                alert(error);
-                location.reload();
-          });
-    }
-}
+    if (Object.keys(matchColumns).length != 0) {
+        sendData = [];
 
-function readInstruction(e) {
-    var dataSrc = e.target.value;
+        for (data of importData) {
+            var validData = {};
 
-    if (dataSrc != '') {
-        window.location.href = '/admin/journey/read-instruction/' + dataSrc;
-    }
-}
+            for (key in matchColumns) {
+                validData[key] = data[matchColumns[key]];
+            }
 
-function submitMappingFile(reports, journeyColumns) {
-    var datasrc = document.getElementById("data-source-name").value
-
-    if (datasrc == '') {
-        alert('Fill out Data Source Name');
-        return;
-    }
-
-    if (reports.includes(datasrc)) {
-        alert('Duplicate Data Source Name');
-        return;
-    }
-
-    
-
-    var matchingColumns = [];
-    var count = 0;
-
-    for (let journey_column of journeyColumns) {
-        var report_column = document.getElementById('report-column-' + journey_column).value;
-        var function_name = document.getElementById('instruction-' + journey_column).value
-        if (report_column == '' && function_name != '') {
-            alert('Must be fill out ' + journey_column + ' field');
-            return;
-        }
-
-        if (report_column != '') {
-            matchingColumns.push({
-                'journey_column': journey_column,
-                'report_column': report_column,
-                'function': function_name
-            })
-
-            count += 1;
+            sendData.push(validData);
         }
     }
 
-    if (count == 0) {
-        alert('Must map at least 1 columns');
+    if (sendData.length == 0) {
+        alert('No data to import')
         return;
     }
-
-    var instructionImg = document.getElementById('upload-instruction').files;
-
-    if (instructionImg.length != 0)
-        instructionImg = instructionImg[0]
-    else
-        instructionImg = null
-
-    var formData = new FormData();
-    formData.append('dataSrc', datasrc)
-    formData.append('matchingColumns', JSON.stringify(matchingColumns))
-    formData.append('files[]', instructionImg)
 
     const csrftoken = getCookie('csrftoken');
-    fetch('/admin/journey/upload-mapping-file', {
-            method: 'post',
-            mode: 'same-origin',
-            headers: {
-                'X-CSRFToken': csrftoken,
-            },
-            body: formData
+    fetch('/admin/journey/upload-touchpoint', {
+        method: 'post',
+        mode: 'same-origin',
+        headers: {
+            "Accept": 'application/json',
+            "Content-type": 'application/json',
+            'X-CSRFToken': csrftoken,
+        },
+        body: JSON.stringify({data: sendData})
         })
         .then(function (response) {
             return response.json();
@@ -387,3 +297,76 @@ function submitMappingFile(reports, journeyColumns) {
             location.reload();
         });
 }
+
+function mapFile(selectObj) {
+    var dataSrc = selectObj.value;
+
+    matchColumns = {};
+    sendData = [];
+
+    if (dataSrc == 'manipulate') {
+        generateTable(headers, importData);
+        generateTableHeadSelectors();
+    } else if (dataSrc == '') {
+        generateTable(headers, importData);
+    } else {
+        var dataSrcMatchColumns = matchedColumns.filter((row) => {
+            if (row.report_name == dataSrc)
+                return true;
+            else
+                return false;
+        })
+
+        sendData = generateMatchedData(dataSrcMatchColumns);
+
+        if (sendData.length > 0) {
+            var matchHeaders = dataSrcMatchColumns.map((row) => {
+                return row.journey_column;
+            })
+
+            generateTable(matchHeaders, sendData);
+        }
+    }
+}
+
+function generateMatchedData(dataSrcMatchColumns) {
+    for (let row of dataSrcMatchColumns) {
+        if (!headers.includes(row.report_column)) {
+            alert("Import File not exist " + row.report_column + " field");
+            return [];
+        }
+    }
+
+    var validDatas = [];
+
+    for (let i=0; i < importData.length; i++) {
+        validData = {};
+
+        for (let row of dataSrcMatchColumns) {
+            var data = importData[i][row.report_column];
+            var checkDataType = true;
+
+            data = convertDataType(row.function, data);
+            
+            if (touchpointFields[row.journey_column] == 'numeric' && !isNumeric(data)) {
+                checkDataType = false
+            } else if (touchpointFields[row.journey_column] == 'date' && !isDate(data)) {
+                checkDataType = false;
+            }
+    
+            if (checkDataType == false) {
+                var message = 'At row ' + i.toString() + ',' + 'cannot match ' + row.report_column + ' to ' + row.journey_column;
+                alert(message);
+
+                return [];
+            }
+
+            validData[row.journey_column] = data;
+        }
+
+        validDatas.push(validData);
+    }
+
+    return validDatas;
+}
+
