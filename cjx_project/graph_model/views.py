@@ -372,7 +372,7 @@ def predict_journey_cluster(algorithm, x_data, clusterModelFile):
 
 
 def save_process_graph(gviz, startDate, endDate, type):
-    filename = '/graph_model/journeyProcessGraph/' + \
+    filename = 'graph_model/journeyProcessGraph/' + \
         str(datetime.now().timestamp()) + ".png"
 
     (static_path, link_url) = get_static_path(filename, 'graph_model')
@@ -386,7 +386,7 @@ def save_process_graph(gviz, startDate, endDate, type):
 
 
 def save_cluster_graph(gviz, clusterID, clusterNumber, type, clusterName=None):
-    filename = '/graph_model/journeyClusterGraph/' + \
+    filename = 'graph_model/journeyClusterGraph/' + \
         str(datetime.now().timestamp()) + ".png"
 
     (static_path, link_url) = get_static_path(filename, 'graph_model')
@@ -418,7 +418,7 @@ def save_graph_file(type, gviz, path):
 
 
 def save_cluster_model(startDate, endDate, algorithm, preprocess, numClusters,  clusterModel, preprocessModel=None, accuracy=0):
-    filename = '/graph_model/journeyClusterModel/' + \
+    filename = 'graph_model/journeyClusterModel/' + \
         str(datetime.now().timestamp()) + ".sav"
     
     (static_path, link_url) = get_static_path(filename, 'graph_model')
