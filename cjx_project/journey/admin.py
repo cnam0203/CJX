@@ -33,7 +33,7 @@ class TouchpointAdmin(admin.ModelAdmin):
 
     def customer(self, obj):
         customerID = Journey_Customer.objects.get(customerID=obj.customer_id)
-        link = "/admin/journey/customer/" + str(customerID.id)
+        link = "/admin/journey/journey_customer/" + str(customerID.id)
         return format_html("<a href='{}'>{}</a>", link, str(obj.customer_id))
 
 
