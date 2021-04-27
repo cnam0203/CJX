@@ -19,6 +19,10 @@ from django.urls import include
 from django.contrib.staticfiles.urls import static
 from django.conf import settings
 
+from . import views
+
+
+
 admin.site.site_header = 'Organization Administration'                      # default: "Django Administration"
 admin.site.index_title = 'Customer Journey Management'                      # default: "Site administration"
 admin.site.site_title = 'Customer Journey Management'                       # default: "Django site admin"
@@ -28,7 +32,7 @@ urlpatterns = [
     path('admin/graph_model/', include('graph_model.urls')),
     path('admin/company_items/', include('company_items.urls')),
     path('admin/', admin.site.urls),
-    path('', admin.site.urls)
+    path('', views.redirectHomepage)
 ]
 
 urlpatterns += static(prefix=settings.STATIC_URL, document_root=settings.STATIC_ROOT)
