@@ -28,9 +28,9 @@ function submitMappingFile(reports, journeyColumns) {
 
     if (reportColumn != '') {
       matchingColumns.push({
-        'journey_column': journey_column,
-        'report_column': report_column,
-        'function': function_name,
+        'journey_column': journeyColumn,
+        'report_column': reportColumn,
+        'function': functionName,
       });
 
       count += 1;

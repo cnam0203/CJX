@@ -1,7 +1,9 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable require-jsdoc */
 function readInstruction(selectObj) {
-    var dataSrc = selectObj.value;
+  const dataSrc = selectObj.value;
 
-    if (dataSrc != '') {
-        window.location.href = '/admin/journey/read-instruction/' + dataSrc;
-    }
+  if (dataSrc != '') {
+    window.location.href = '/admin/journey/read-instruction/' + dataSrc;
+  }
 }
