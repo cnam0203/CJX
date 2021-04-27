@@ -422,7 +422,6 @@ def save_cluster_model(startDate, endDate, algorithm, preprocess, numClusters,  
         str(datetime.now().timestamp()) + ".sav"
     
     (static_path, link_url) = get_static_path(filename, 'graph_model')
-    save_graph_file(type, gviz, static_path)
 
     joblib.dump(clusterModel, path)
 
