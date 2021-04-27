@@ -423,7 +423,7 @@ def save_cluster_model(startDate, endDate, algorithm, preprocess, numClusters,  
     
     (static_path, link_url) = get_static_path(filename, 'graph_model')
 
-    joblib.dump(clusterModel, path)
+    joblib.dump(clusterModel, static_path)
 
     newModel = Journey_Cluster_Model.objects.create(startDate=startDate,
                                                     endDate=endDate,
