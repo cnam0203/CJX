@@ -1,0 +1,6 @@
+pymysql
+pm4py
+numpy
+sklearn
+pandas
+kmodes
