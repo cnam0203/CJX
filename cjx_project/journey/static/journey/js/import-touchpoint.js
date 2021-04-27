@@ -1,33 +1,23 @@
 var importData = [];
-var matchColumns = {};
-var table = document.getElementById('tbl-csv-data');
-var mappingTypeDiv = document.getElementById('select-mapping-type');
-var submitBtn = document.getElementById("submit-file");
-var touchpointFields = {};
 var matchedColumns = [];
 var headers = [];
 var sendData =[];
 
+var matchColumns = {};
+var touchpointFields = {};
 
-
-function isNumeric(str) {
-    if (typeof str != "string") return false // we only process strings!  
-    return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
-           !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
-}
-
-function isDate(dateStr) {
-    return !isNaN(new Date(dateStr).getDate());
-}
+var table = document.getElementById('tbl-csv-data');
+var mappingTypeDiv = document.getElementById('select-mapping-type');
+var submitBtn = document.getElementById("submit-file");
 
 function importFile(allFields, allMatchedColumns) {
     refreshUpload();
 
-    mappingTypeDiv.style.display = "block";
-    submitBtn.style.display = "inline-block";
-
     var inputFile = document.getElementById('upload-csv').files[0];
     var report = document.getElementById('report');
+
+    mappingTypeDiv.style.display = "block";
+    submitBtn.style.display = "inline-block";
 
     touchpointFields = allFields;
     matchedColumns = allMatchedColumns;
@@ -46,7 +36,6 @@ function importCSV(inputFile) {
         complete: function(results) {
             headers = results.meta.fields;
             importData = results.data;
-
             generateTable(headers, importData);
         }
     });
@@ -102,16 +91,10 @@ function refreshUpload() {
     matchColumns = {};
     sendData = [];
     headers = [];
+
     table.innerHTML = '';
     submitBtn.style.display = 'none';
     mappingTypeDiv.style.display = 'none';
-}
-
-function generateCSVData(importData, keys, data) {
-    var newData = {};
-
-    keys.map(field => { newData[field] = data[field] ? data[field] : null; })
-    importData.push(newData);
 }
 
 function generateJSONData(results) {
@@ -159,10 +142,11 @@ function matchColumn(e) {
     
     for (let field in matchColumns) {
         if (targetColumn == field) {
-            alert('Duplicate matching column');
             e.target.value = 'None';
             changeHeaderBackgroundColor(currentColumn, '#666', '#f8f8f8');
-            return
+            alert('Duplicate matching column');
+
+            return;
         }
     }
 
@@ -178,9 +162,11 @@ function matchColumn(e) {
 
         if (checkDataType == false) {
             var message = 'At row ' + i.toString() + ', data type is invalid, match column data type must be ' + touchpointFields[targetColumn];
-            alert(message);
+
             e.target.value = 'None';
             changeHeaderBackgroundColor(currentColumn, '#666', '#f8f8f8');
+            alert(message);
+
             return
         }
     }
@@ -268,32 +254,6 @@ function generateTableRows(headerNames, data) {
     }
 }
 
-function showMessage(message, time) {
-    setTimeout(function() {
-        alert(message);
-    }, time);
-}
-
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-function isEmpty(obj) {
-    return Object.keys(obj).length === 0;
-}
-
 function submitTouchpoint() {
     if (Object.keys(matchColumns).length != 0) {
         sendData = [];
@@ -308,8 +268,6 @@ function submitTouchpoint() {
             sendData.push(validData);
         }
     }
-
-    console.log(sendData);
 
     if (sendData.length == 0) {
         alert('No data to import')
@@ -340,95 +298,11 @@ function submitTouchpoint() {
         });
 }
 
-function readInstruction(selectObj) {
+function mapFile(selectObj) {
     var dataSrc = selectObj.value;
 
-    if (dataSrc != '') {
-        window.location.href = '/admin/journey/read-instruction/' + dataSrc;
-    }
-}
-
-function submitMappingFile(reports, journeyColumns) {
-    var datasrc = document.getElementById("data-source-name").value
-
-    if (datasrc == '') {
-        alert('Fill out Data Source Name');
-        return;
-    }
-
-    if (reports.includes(datasrc)) {
-        alert('Duplicate Data Source Name');
-        return;
-    }
-
-    
-
-    var matchingColumns = [];
-    var count = 0;
-
-    for (let journey_column of journeyColumns) {
-        var report_column = document.getElementById('report-column-' + journey_column).value;
-        var function_name = document.getElementById('instruction-' + journey_column).value
-        if (report_column == '' && function_name != '') {
-            alert('Must be fill out ' + journey_column + ' field');
-            return;
-        }
-
-        if (report_column != '') {
-            matchingColumns.push({
-                'journey_column': journey_column,
-                'report_column': report_column,
-                'function': function_name
-            })
-
-            count += 1;
-        }
-    }
-
-    if (count == 0) {
-        alert('Must map at least 1 columns');
-        return;
-    }
-
-    var instructionImg = document.getElementById('upload-instruction').files;
-
-    if (instructionImg.length != 0)
-        instructionImg = instructionImg[0]
-    else
-        instructionImg = null
-
-    var formData = new FormData();
-    formData.append('dataSrc', datasrc)
-    formData.append('matchingColumns', JSON.stringify(matchingColumns))
-    formData.append('files[]', instructionImg)
-
-    const csrftoken = getCookie('csrftoken');
-    fetch('/admin/journey/upload-mapping-file', {
-            method: 'post',
-            mode: 'same-origin',
-            headers: {
-                'X-CSRFToken': csrftoken,
-            },
-            body: formData
-        })
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (data) {
-            alert(data.result);
-            location.reload();
-        })
-        .catch(function (error) {
-            alert(error);
-            location.reload();
-        });
-}
-
-function mapFile(selectObj) {
     matchColumns = {};
     sendData = [];
-
-    var dataSrc = selectObj.value;
 
     if (dataSrc == 'manipulate') {
         generateTable(headers, importData);
@@ -443,7 +317,7 @@ function mapFile(selectObj) {
                 return false;
         })
 
-        generateMatchedData(dataSrcMatchColumns);
+        sendData = generateMatchedData(dataSrcMatchColumns);
 
         if (sendData.length > 0) {
             var matchHeaders = dataSrcMatchColumns.map((row) => {
@@ -459,9 +333,11 @@ function generateMatchedData(dataSrcMatchColumns) {
     for (let row of dataSrcMatchColumns) {
         if (!headers.includes(row.report_column)) {
             alert("Import File not exist " + row.report_column + " field");
-            return;
+            return [];
         }
     }
+
+    var validDatas = [];
 
     for (let i=0; i < importData.length; i++) {
         validData = {};
@@ -479,7 +355,6 @@ function generateMatchedData(dataSrcMatchColumns) {
             }
     
             if (checkDataType == false) {
-                sendData = [];
                 var message = 'At row ' + i.toString() + ',' + 'cannot match ' + row.report_column + ' to ' + row.journey_column;
                 alert(message);
 
@@ -489,23 +364,9 @@ function generateMatchedData(dataSrcMatchColumns) {
             validData[row.journey_column] = data;
         }
 
-        sendData.push(validData);
+        validDatas.push(validData);
     }
+
+    return validDatas;
 }
 
-function convertDataType(functionName, data) {
-    if (functionName == 'lower') 
-        data = data.toLowerCase()
-    else if (functionName == 'upper')
-        data = data.toUpperCase()
-    else if (functionName == 'datetime')
-        data = new Date(data)
-    else if (functionName == 'string')
-        data = data.toString()
-    else if (functionName == 'int')
-        data = parseInt(data)
-    else if (functionName == 'float')
-        data = parseFloat(data)
-
-    return data
-}

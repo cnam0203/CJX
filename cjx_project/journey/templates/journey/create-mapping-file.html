@@ -10,8 +10,8 @@
             <br/>
             <table style="width:500px; margin: auto" >
                 <tr>
-                  <th style="text-align:center; border:1px solid #000000">Your Report Fields</th>
                   <th style="text-align:center; border:1px solid #000000">Customer Journey Fields</th>
+                  <th style="text-align:center; border:1px solid #000000">Your Report Fields</th>
                   <th style="text-align:center; border:1px solid #000000">Function</th>
                 </tr>
                 {% for column in journeyColumns%}
@@ -48,5 +48,6 @@
             />
         </div>
         {% load static %}  
-        <script src="{% static '/journey/js/index.js' %}" type="text/javascript"></script> 
+        <script src="{% static '/journey/js/utils.js' %}" type="text/javascript"></script> 
+        <script src="{% static '/journey/js/create-mapping-file.js' %}" type="text/javascript"></script> 
 {% endblock %}

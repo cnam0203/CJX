@@ -72,7 +72,7 @@ class Matching_Report_Admin(admin.ModelAdmin):
 
 class Matching_Column_Admin(admin.ModelAdmin):
     list_display = ("id", "report", "journey_column", "report_column", "function")
-    search_fields = ("report", "journey_column", "report_column")
+    search_fields = ("report__name", "journey_column", "report_column")
 
 admin.site.register(Touchpoint, TouchpointAdmin)
 admin.site.register(Channel_Type, Channel_Type_Admin)

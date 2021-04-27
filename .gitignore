@@ -137,3 +137,8 @@ dmypy.json
 
 *.png
 *.sav
+
+node_modules/
+.enslintrc.js
+package-lock.json
+package.json
