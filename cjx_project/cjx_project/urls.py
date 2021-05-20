@@ -18,6 +18,7 @@ from django.urls import path
 from django.urls import include
 from django.contrib.staticfiles.urls import static
 from django.conf import settings
+from . import views
 
 from . import views
 
@@ -31,7 +32,10 @@ urlpatterns = [
     path('admin/journey/', include('journey.urls')),
     path('admin/graph_model/', include('graph_model.urls')),
     path('admin/company_items/', include('company_items.urls')),
+    path('authentication/', include('authentication.urls')),
     path('admin/', admin.site.urls),
+    path('journey/', include('journey.urls')),
+    path('graph_model/', include('graph_model.urls')),
     path('', views.redirectHomepage)
 ]
 

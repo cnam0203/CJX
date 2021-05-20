@@ -1,5 +1,6 @@
 from django.db import models
 from django.apps import apps
+from django.utils.timezone import now
 
 # Create your models here.
 
@@ -49,7 +50,6 @@ class Experience_Emotion(models.Model):
         return str(self.name)
         
 
-
 class Action_Type(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True, unique=True)
 
@@ -58,7 +58,7 @@ class Action_Type(models.Model):
 
 class Journey_Customer(models.Model):
     customerID  = models.BigIntegerField(blank=False, null=True, unique=True)
-    register_date = models.DateTimeField(auto_now=True)
+    register_date = models.DateTimeField(blank=False, default=now)
 
 class Touchpoint(models.Model):
     customer_id            = models.BigIntegerField(blank=False, null=True)
@@ -108,7 +108,6 @@ class Touchpoint(models.Model):
         #         journey_customer.register_date = self.visit_time
         #         journey_customer.save()
         super(Touchpoint, self).save()
-
 
 
 class Matching_Report(models.Model):

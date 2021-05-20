@@ -4,6 +4,6 @@ function readInstruction(selectObj) {
   const dataSrc = selectObj.value;
 
   if (dataSrc != '') {
-    window.location.href = '/admin/journey/read-instruction/' + dataSrc;
+    window.location.href = '/journey/import/review-mapping-file/' + dataSrc;
   }
 }

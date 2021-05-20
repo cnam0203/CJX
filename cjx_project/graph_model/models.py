@@ -19,7 +19,7 @@ class Journey_Cluster_Model(models.Model):
 
 class Clustered_Journey_Graph(models.Model):
     id = models.AutoField(primary_key=True)
-    clusterID = models.IntegerField(blank=True, null=True)
+    clusterModelID = models.IntegerField(blank=True, null=True)
     clusterNumber = models.IntegerField(blank=True, null=True)
     clusterName = models.CharField(
         max_length=50, blank=True, default="undefined", null=True)

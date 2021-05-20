@@ -1,39 +1,193 @@
-from django.shortcuts import render
 from django.contrib.auth.decorators import user_passes_test
-from django.shortcuts import redirect
-from django.http import HttpResponse
-from django.http import JsonResponse
-
-from django.db import Error
-from django.db import DataError
-from django.db import DatabaseError
-from django.db import IntegrityError
+from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
+from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.apps import apps
+from django.db import Error, DataError, DatabaseError, IntegrityError
 from django.core.exceptions import ValidationError
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from django.contrib.gis.geoip2 import GeoIP2
 
+from .models import Touchpoint, Journey_Customer, Action_Type, Channel_Type, Source_Type, Device_Browser, Device_OS, Device_Category, Device_Category, Interact_Item_Type, Experience_Emotion, Matching_Report, Matching_Column
+from .forms import Touchpoint_Form, Journey_Customer_Form, Action_Type_Form, Channel_Type_Form, Source_Type_Form, Device_Browser_Form, Device_OS_Form, Device_Category_Form, Interact_Item_Type_Form, Experience_Emotion_Form, Matching_Report_Form, Matching_Column_Form
+
+from utils.path_helper import get_static_path
+from utils.copy_object import copy_object
 from datetime import datetime
-
-from .models import Touchpoint
-from .models import Action_Type
-from .models import Channel_Type
-from .models import Source_Type
-from .models import Device_Browser
-from .models import Device_OS
-from .models import Device_OS
-from .models import Device_Category
-from .models import Interact_Item_Type
-from .models import Experience_Emotion
-from .models import Matching_Report
-from .models import Matching_Column
 
 import json
 import os
 
-from utils.path_helper import get_static_path
 # Create your views here.
 
+formData = {
+    'touchpoint': Touchpoint_Form,
+    'journey_customer': Journey_Customer_Form,
+    'action_type': Action_Type_Form,
+    'channel_type': Channel_Type_Form,
+    'source_type': Source_Type_Form,
+    'device_browser': Device_Browser_Form,
+    'device_os': Device_OS_Form,
+    'device_category': Device_Category_Form,
+    'interact_item_type': Interact_Item_Type_Form,
+    'experience_emotion': Experience_Emotion_Form,
+    'matching_column': Matching_Column_Form,
+    'matching_report': Matching_Report_Form
+}
 
 
-@user_passes_test(lambda user: user.is_staff, login_url="/admin")
+@login_required(login_url="/authentication/login")
+def home(request):
+    return render(request, "journey/home.html", {'activities':[
+            {'customerID': '123456', 'visitTime': '2020-01-01', 'actionType': 'purchase', 'channelType': 'web', 'device': 'iOS', 'experience': 'happy'},
+            {'customerID': '123456', 'visitTime': '2020-01-01', 'actionType': 'purchase', 'channelType': 'web', 'device': 'iOS', 'experience': 'happy'},
+            {'customerID': '123456', 'visitTime': '2020-01-01', 'actionType': 'purchase', 'channelType': 'web', 'device': 'iOS', 'experience': 'happy'},
+            {'customerID': '123456', 'visitTime': '2020-01-01', 'actionType': 'purchase', 'channelType': 'web', 'device': 'iOS', 'experience': 'happy'},
+            {'customerID': '123456', 'visitTime': '2020-01-01', 'actionType': 'purchase', 'channelType': 'web', 'device': 'iOS', 'experience': 'happy'}
+        ]
+    })
+
+
+@login_required(login_url="/authentication/login")
+def get_import_page(request):
+    all_fields = {}
+    matching_reports = [report for report in Matching_Report.objects.all()]
+    matched_columns = [{'report_name': column.report.name,
+                        'report_column': column.report_column,
+                        'journey_column': column.journey_column,
+                        'function': column.function
+                        } for column in Matching_Column.objects.all()]
+
+    for field in Touchpoint._meta.get_fields():
+        if (field.name != "id" and field.name != "record_time"):
+            data_type = field.get_internal_type()
+            converted_type = ""
+
+            if (data_type == "BigIntegerField" or data_type == "IntegerField" or data_type == "FloatField"):
+                converted_type = "numeric"
+            elif (data_type == "DateTimeField" or data_type == "DataField"):
+                converted_type = "date"
+            else:
+                converted_type = "string"
+
+            all_fields[field.name] = converted_type
+    return render(request, "journey/import.html", {"allFields": all_fields, "matchingReports": matching_reports, "matchedColumns": matched_columns})
+
+
+@login_required(login_url="/authentication/login")
+def get_create_mapping_file(request):
+    fields = [field.name for field in Touchpoint._meta.get_fields(
+    ) if field.name != 'id' and field.name != 'report_time']
+    reports = [report.name for report in Matching_Report.objects.all()]
+
+    return render(request, "journey/mapping-file.html", {
+        'reports': reports,
+        'fields': fields,
+        'functions': ['lower', 'upper', 'string', 'int', 'float', 'datetime', 'date']
+    })
+
+
+@login_required(login_url="/authentication/login")
+def review_mapping_file(request, dataSrcName=None):
+    matching_reports = [report for report in Matching_Report.objects.all()]
+    list_matching_fields = []
+    instruction_img = None
+
+    if (dataSrcName is not None):
+        list_matching_fields = [[row.report_column, row.journey_column, row.function]
+                          for row in Matching_Column.objects.filter(report__name=dataSrcName)]
+        instruction_img = Matching_Report.objects.get(
+            name=dataSrcName).instruction_link
+
+    return render(request, "journey/review-mapping.html", {"dataSrcs": matching_reports, 
+                                                            "dataSrcName": dataSrcName, 
+                                                            "listMatchingFields": list_matching_fields,
+                                                            "instructionImg": instruction_img})
+
+@login_required(login_url="/authentication/login")
+def get_list_data(request, tablename):
+    Model = apps.get_model(app_label="journey", model_name=tablename)
+    new_data = []
+    headers = []
+
+    if (tablename == 'touchpoint'):
+        data = list(Model.objects.all().values('id', 'customer_id', 'action_type__name', 'visit_time', 'channel_type__name',
+                    'device_browser__name', 'device_os__name', 'device_category__name', 'geo_continent',
+                    'geo_country', 'geo_city', 'interact_item_type__name', 'interract_item_content', 'experience_emotion__name'))
+        headers = ['id', 'customer_id', 'action_type', 'visit_time', 'channel_type',
+                    'device_browser', 'device_os', 'device_category', 'geo_continent',
+                    'geo_country', 'geo_city', 'interact_item_type', 'interract_item_content', 'experience_emotion']
+        new_data = data
+    elif (tablename == 'matching_report'):
+        data = list(Model.objects.all().values())
+        headers = ['id', 'name', 'instructionExample']
+
+        for obj in data:
+            obj['instructionExample'] = {}
+            obj['instructionExample']['link'] = obj['instruction_link']
+            obj['instructionExample']['value'] = 'view'
+
+            new_obj = copy_object(obj, headers)
+            new_data.append(new_obj)
+
+    elif (tablename == 'matching_column'):
+        data = list(Model.objects.all().values('id','report__name', 'journey_column', 'report_column', 'function'))
+        headers = ['id','report', 'journey_column', 'report_column', 'function']
+        new_data = data
+    else:
+        data = list(Model.objects.all().values())
+        new_data = data
+        headers = []
+        for field in Model._meta.fields:
+            if type(field) != "<class 'django.db.models.fields.reverse_related.ManyToOneRel'>":
+                headers.append(field.name)
+
+    return render(request, "journey/base-table.html", {'data': new_data, 'tableName': tablename, 'headers': headers})
+
+
+@login_required(login_url="/authentication/login")
+def create_form_data(request, tablename):
+    Model = apps.get_model(app_label="journey", model_name=tablename)
+    FormModel = formData[tablename]
+
+    form = FormModel()
+    if request.method == "POST":
+        form = FormModel(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("/journey/table/" + tablename)
+
+    return render(request, "journey/base-form.html", {'formName': 'Form ' + tablename, 'form': form})
+
+
+@login_required(login_url="/authentication/login")
+def update_form_data(request, tablename, id=None):
+    Model = apps.get_model(app_label="journey", model_name=tablename)
+    FormModel = formData[tablename]
+
+    obj = get_object_or_404(Model, pk=id)
+    form = FormModel(instance=obj)
+    if request.method == "POST":
+        form = FormModel(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            return redirect("/journey/table/" + tablename)
+        print(form.errors)
+    
+    return render(request, "journey/base-form.html", {'formName': 'Form ' + tablename, 'form': form})
+
+
+@login_required(login_url="/authentication/login")
+def delete_form_data(request, tablename, id=None):
+    Model = apps.get_model(app_label="journey", model_name=tablename)
+    FormModel = formData[tablename]
+
+    obj = get_object_or_404(Model, pk=id)
+    obj.delete()
+    return redirect("/journey/table/" + tablename)
+
+
+@login_required(login_url="/authentication/login")
 def import_touchpoint(request):
     all_fields = {}
     matching_reports = [report for report in Matching_Report.objects.all()]
@@ -59,20 +213,68 @@ def import_touchpoint(request):
 
     return render(request, "journey/import-touchpoint.html", {"allFields": all_fields, "matchingReports": matching_reports, "matchedColumns": matched_columns})
 
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
-@user_passes_test(lambda user: user.is_staff, login_url="/admin")
+def track_geo_info(request, data):
+    ip = get_client_ip(request)
+    g = GeoIP2()
+
+    try:
+        geolocation = g.city(ip)
+        data['geo_continent'] = geolocation['time_zone']
+        data['geo_country'] = geolocation['country_name']
+        data['geo_city'] = geolocation['city']
+    except:
+        pass
+
+    return data
+
+def track_device_info(request, data):
+    data['device_browser'] = request.user_agent.browser.family
+    data['device_os'] = request.user_agent.os.family
+
+    if (request.user_agent.is_mobile):
+        data['device_category'] = 'mobile'
+    elif (request.user_agent.is_mobile):
+        data['device_category'] = 'tablet'
+    elif (request.user_agent.is_pc):
+        data['device_category'] = 'desktop'
+
+    return data
+
+@csrf_exempt
+def add_new_touchpoint(req):
+    body = json.loads(req.body)
+    data = body["data"]
+    data = track_device_info(req, data)
+    data = track_geo_info(req, data)
+
+    print(data)
+
+    new_touchpoint = create_new_touchpoint(data)
+    new_touchpoint.save()
+
+    return HttpResponse()
+
+@login_required(login_url="/authentication/login")
 def read_instruction(request):
     matching_reports = [report for report in Matching_Report.objects.all()]
 
     return render(request, "journey/read-instruction.html", {"matchingReports": matching_reports})
 
 
-@user_passes_test(lambda user: user.is_staff, login_url="/admin")
+@login_required(login_url="/authentication/login")
 def export_touchpoint(request):
     return render(request, "journey/export-touchpoint.html")
 
-
-@user_passes_test(lambda user: user.is_staff, login_url="/admin")
+@login_required(login_url="/authentication/login")
+@csrf_exempt
 def upload_touchpoint(request):
     if request.method == "POST":
         body = json.loads(request.body)
@@ -80,38 +282,47 @@ def upload_touchpoint(request):
         new_touchpoints = []
 
         for touchpoint in touchpoints:
-            new_touchpoint = Touchpoint()
-            for key in touchpoint:
-                value = touchpoint[key]
-                if key == "action_type":
-                    new_value = get_or_none(Action_Type, value, key)
-                elif key == "source_name":
-                    new_value = get_or_none(Source_Type, value, key)
-                elif key == "channel_type":
-                    new_value = get_or_none(Channel_Type, value, key)
-                elif key == "device_browser":
-                    new_value = get_or_none(Device_Browser, value, key)
-                elif key == "device_os":
-                    new_value = get_or_none(Device_OS, value, key)
-                elif key == "device_category":
-                    new_value = get_or_none(Device_Category, value, key)
-                elif key == "interact_item_type":
-                    new_value = get_or_none(Interact_Item_Type, value, key)
-                elif key == "experience_emotion":
-                    new_value = get_or_none(Experience_Emotion, value, key)
-                else:
-                    new_value = value
-
-                if isinstance(new_value, dict) and "error" in new_value:
-                    return JsonResponse({"result": new_value["error"]})
-                else:
-                    setattr(new_touchpoint, key, new_value)
-                    new_touchpoints.append(new_touchpoint)
+            new_touchpoint = create_new_touchpoint(touchpoint)
+            new_touchpoints.append(new_touchpoint)
 
         for new_touchpoint in new_touchpoints:
             new_touchpoint.save()
 
         return JsonResponse({"result": "Import Successfully"})
+
+
+def create_new_touchpoint(touchpoint):
+    new_touchpoint = Touchpoint()
+    for key in touchpoint:
+        value = touchpoint[key]
+        if (value == '' or value is None):
+            continue
+        if key == "action_type":
+            new_value = get_or_none(Action_Type, value, key)
+        elif key == "source_name":
+            new_value = get_or_none(Source_Type, value, key)
+        elif key == "channel_type":
+            new_value = get_or_none(Channel_Type, value, key)
+        elif key == "device_browser":
+            new_value = get_or_none(Device_Browser, value, key)
+        elif key == "device_os":
+            new_value = get_or_none(Device_OS, value, key)
+        elif key == "device_category":
+            new_value = get_or_none(Device_Category, value, key)
+        elif key == "interact_item_type":
+            new_value = get_or_none(Interact_Item_Type, value, key)
+        elif key == "experience_emotion":
+            new_value = get_or_none(Experience_Emotion, value, key)
+        else:
+            new_value = value
+
+        if isinstance(new_value, dict) and "error" in new_value:
+            print(new_value["error"])
+            return JsonResponse({"result": new_value["error"]})
+        else:
+            setattr(new_touchpoint, key, new_value)
+    
+    return new_touchpoint
 
 
 def get_or_none(classmodel, name, column):
@@ -120,15 +331,13 @@ def get_or_none(classmodel, name, column):
     except classmodel.MultipleObjectsReturned:
         return {"error": "At column " + column + ", " + name + " is not an appropriate value"}
     except classmodel.DoesNotExist:
-        if name is None:
-            obj = classmodel.objects.create(name=name)
-            obj.save()
-            return obj
-        else:
-            return {"error": "At column " + column + ", " + name + " is not an appropriate value"}
+        obj = classmodel.objects.create(name=name)
+        obj.save()
+        return obj
 
 
-@user_passes_test(lambda user: user.is_staff, login_url="/admin")
+
+
 def read_detail_instruction(request, datasrc):
     listMatchingFields = [[row.report_column, row.journey_column, row.function]
                           for row in Matching_Column.objects.filter(report__name=datasrc)]
@@ -137,7 +346,7 @@ def read_detail_instruction(request, datasrc):
     return render(request, "journey/read-detail-instruction.html", {'dataSrc': datasrc.upper(), 'listMatchingFields': listMatchingFields, 'instructionImg': instruction_img})
 
 
-@user_passes_test(lambda user: user.is_staff, login_url="/admin")
+@login_required(login_url="/authentication/login")
 def create_mapping_file(request):
     journey_columns = [column.name for column in Touchpoint._meta.get_fields(
     ) if column.name != 'id' and column.name != 'report_time']
@@ -146,7 +355,8 @@ def create_mapping_file(request):
     return render(request, "journey/create-mapping-file.html", {'reports': reports, 'journeyColumns': journey_columns, 'functions': functions})
 
 
-@user_passes_test(lambda user: user.is_staff, login_url="/admin")
+@login_required(login_url="/authentication/login")
+@csrf_exempt
 def upload_mapping_file(request):
     if request.method == "POST":
         data_source = request.POST.get('dataSrc')

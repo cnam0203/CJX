@@ -7,5 +7,10 @@ urlpatterns = [
     path('get-cluster-journey-page', views.get_cluster_journey_page),
     path('get-cluster-journey', views.get_cluster_journey),
     path('get-cluster-user-page/<int:id>', views.get_cluster_user_page),
-    path('get-cluster-user/<int:id>', views.get_cluster_user)
+    path('get-cluster-user/<int:id>', views.get_cluster_user),
+    path('analytics/visualize-process-graph', views.visualize_process_graph),
+    path('analytics/trace-clustering', views.trace_clustering),
+    path('analytics/cluster-customer/<int:id>', views.cluster_customer),
+    path('table/<tablename>', views.get_list_data),
+    path('form/update/<tablename>/<id>', views.update_form_data)
 ]

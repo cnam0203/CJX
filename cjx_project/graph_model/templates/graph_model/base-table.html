@@ -1,0 +1,52 @@
+{% extends 'journey/base-dashboard.html' %}
+
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'graph_model/css/base-table.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <div class="table-container" data-aos="fade-up">
+        <div class="table-name">Table {{ tableName }}</div>
+        <div class="table-configure">
+            <div class="configure"></div>
+            <div class="configure">
+                <div class="search-box">
+                    <input type="text" name="" class="search-txt" placeholder="Searching..."/>
+                    <a class="search-btn">
+                        <img src="{% static '/journey/images/loupe.svg' %}"/>
+                    </a>
+                </div>
+            </div>
+            <div class="configure">
+            </div>
+        </div>
+        <div class="table-content">
+            <div class="table-header">
+                {% for header in headers %}
+                    {% if forloop.counter|divisibleby:2 %}
+                        <div class="header-field">{{ header }}</div>
+                    {% else %}
+                        <div class="header-field" style='color: #F04444'>{{ header }}</div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% for row in data %}
+                <div class="table-row">
+                    {% for key, value in row.items %}
+                        {% if key == 'id' %}
+                            <a href='/graph_model/form/update/{{tableName}}/{{value}}' class="table-column" style="color:#FF8484">{{ value }}</a>
+                        {% elif value.value %}
+                            <a href='{{value.link}}' class="table-column" style="color:#FF8484">{{value.value}}</a>
+                        {% else %}
+                            <div class="table-column">{{ value }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <script>
+        AOS.init({duration: 1500,});
+    </script>
+{% endblock %}

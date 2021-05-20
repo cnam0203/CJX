@@ -28,7 +28,7 @@ class Clustered_Journey_Graph_Admin(admin.ModelAdmin):
         return format_html("<a href='{}'>{}</a>", link, obj.clusterID)
 
     def image(self, obj):
-        if (obj.instruction_link != ''):
+        if (obj.link != ''):
             return format_html("<a href='{url}'>{url}</a>", url=obj.link)
         else:
             return ''

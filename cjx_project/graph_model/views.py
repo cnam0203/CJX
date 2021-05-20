@@ -1,13 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import user_passes_test
-from django.shortcuts import redirect
 from django.http import HttpResponse
+from django.apps import apps
+from django.contrib.auth.decorators import login_required
 
-from .models import Journey_Process_Graph
-from .models import Clustered_Journey_Graph
-from .models import Clustered_Customer
-from .models import Journey_Cluster_Model
+from .models import Journey_Process_Graph, Clustered_Journey_Graph, Clustered_Customer, Journey_Cluster_Model
+from .forms import Journey_Process_Graph_Form, Clustered_Journey_Graph_Form, Clustered_Customer_Form, Journey_Cluster_Model_Form
+
 from journey.models import Touchpoint
+from utils.copy_object import copy_object
 
 from datetime import datetime
 from sklearn.cluster import KMeans
@@ -37,52 +38,189 @@ from pm4py.visualization.dfg import visualizer as dfg_visualization
 from utils.path_helper import get_static_path
 # Create your views here.
 
+formData = {
+    'journey_cluster_model': Journey_Cluster_Model_Form,
+    'clustered_journey_graph': Clustered_Journey_Graph_Form,
+    'clustered_customer': Clustered_Customer_Form,
+    'journey_process_graph': Journey_Process_Graph_Form 
+}
 
-@user_passes_test(lambda user: user.is_staff, login_url='/admin')
+mining_algorithms = [
+        {"value": "alpha", "name": "Alpha Miner with Petri Net"},
+        {"value": "heuristic-heu-net", "name": "Heuristic Miner with Heuristic Net"},
+        {"value": "heuristic-pet-net", "name": "Heuristic Miner with Petri Net"},
+        {"value": "dfg-discovery-frequency", "name": "DFG-Discovery with Frequency"},
+        {"value": "dfg-discovery-active-time", "name": "DFG-Discovery with Active time"},
+        {"value": "inductive-miner-tree", "name": "Inductive Miner with Tree Graph"},
+        {"value": "inductive-miner-petri", "name": "Inductive Miner with Petri Net"}
+    ]
+
+preprocessing_methods = [
+        {"value": "bag-of-activities", "name": "Bag of Activities"},
+        {"value": "sequence-vector", "name": "Sequence vector"},
+    ]
+
+clustering_algorithms = [
+        {"value": "k-means", "name": "K-Means"},
+        {"value": "k-modes", "name": "K-Modes"},
+        {"value": "k-neighbor", "name": "K-Neighbor"},
+        {"value": "agglomerative-hierarchical", "name": "Agglomerative Hierarchical"},
+    ]
+
+@login_required(login_url="/authentication/login")
+def visualize_process_graph(request):
+    return render(request, "graph_model/visualize-process-graph.html", {"mining_algorithms": mining_algorithms})
+
+
+@login_required(login_url="/authentication/login")
+def trace_clustering(request):
+    return render(request, "graph_model/trace-clustering.html", {
+            "preprocessing_methods": preprocessing_methods,
+            "clustering_algorithms": clustering_algorithms,
+            "mining_algorithms": mining_algorithms})
+
+
+@login_required(login_url="/authentication/login")
+def get_list_data(request, tablename):
+    Model = apps.get_model(app_label="graph_model", model_name=tablename)
+    data = list(Model.objects.all().values())
+    headers = []
+    new_data = []
+
+    if (tablename == "journey_process_graph"):
+        headers = ['id', 'startDate', 'endDate', 'runDate', 'miningAlgorithm', 'processGraph']
+
+        for obj in data:
+            obj['miningAlgorithm'] = obj["type"]
+            
+            obj['processGraph'] = {}
+            obj['processGraph']['link'] = obj["link"]
+            obj['processGraph']['value'] = 'view'
+
+            new_obj = copy_object(obj, headers)
+            new_data.append(new_obj)
+        
+    elif (tablename == "clustered_journey_graph"):
+        headers = ['id', 'clusterModel', 'clusterNumber', 'clusterName', 'miningAlgorithm', 'processGraph']
+
+        for obj in data:
+            obj['miningAlgorithm'] = obj["type"]
+
+            obj['processGraph'] = {}
+            obj['processGraph']['link'] = obj["link"]
+            obj['processGraph']['value'] = 'view'
+        
+            obj['clusterModel'] = {}
+            obj['clusterModel']['link'] = "/graph_model/form/update/journey_cluster_model/" + str(obj["clusterModelID"])
+            obj['clusterModel']['value'] = str(obj["clusterModelID"])
+
+            new_obj = copy_object(obj, headers)
+            new_data.append(new_obj)
+
+    elif (tablename == "journey_cluster_model"):
+        headers = ("id", "runDate", "algorithm", "preprocessing", "numberClusters", "accuracy", "clusterCustomer")
+
+        for obj in data:
+            obj["clusterCustomer"] = {}
+            obj["clusterCustomer"]['link'] = "/graph_model/analytics/cluster-customer/" + str(obj["id"])
+            obj["clusterCustomer"]['value'] = 'Cluster now'
+
+            new_obj = copy_object(obj, headers)
+            new_data.append(new_obj)
+
+    elif (tablename == "clustered_customer"):
+        headers = ["id", "customer_id", "clusterID", "clusterGroup", "fromDate", "toDate", "journey", "clusterProcessGraph"]
+
+        for obj in data:
+            cluster_id = obj["cluster_id"]
+            cluster = Clustered_Journey_Graph.objects.get(pk=cluster_id)
+
+            obj["clusterGroup"] = cluster.clusterName
+
+            obj["clusterID"] = {}
+            obj["clusterID"]['link'] = "/graph_model/form/update/clustered_journey_graph/" + str(cluster_id)
+            obj["clusterID"]['value'] = str(cluster_id)
+
+            obj["clusterProcessGraph"] = {}
+            obj["clusterProcessGraph"]['link'] = cluster.link
+            obj["clusterProcessGraph"]['value'] = 'view'
+
+            new_obj = copy_object(obj, headers)
+            new_data.append(new_obj)
+
+    return render(request, "graph_model/base-table.html", {'data': new_data, 'tableName': tablename, 'headers': headers})
+
+
+@login_required(login_url="/authentication/login")
+def update_form_data(request, tablename, id=None):
+    Model = apps.get_model(app_label="graph_model", model_name=tablename)
+    FormModel = formData[tablename]
+
+    obj = get_object_or_404(Model, pk=id)
+    form = FormModel(instance=obj)
+    if request.method == "POST":
+        form = FormModel(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            return redirect("/graph_model/table/" + tablename) 
+    
+    return render(request, "graph_model/base-form.html", {'formName': 'Form ' + tablename, 'form': form})
+
+
+@login_required(login_url="/authentication/login")
+def cluster_customer(request, id):
+    return render(request, "graph_model/cluster-customer.html", {"clusterID": id, "clusterSuccess": False})
+
+
+@login_required(login_url="/authentication/login")
 def get_cluster_journey_page(request):
     return render(request, "graph_model/cluster-journey.html")
 
 
-@user_passes_test(lambda user: user.is_staff, login_url='/admin')
+@login_required(login_url="/authentication/login")
 def get_visualize_graph_page(request):
     return render(request, "graph_model/visualize-graph.html", {"imgSrc": ''})
 
 
-@user_passes_test(lambda user: user.is_staff, login_url='/admin')
+@login_required(login_url="/authentication/login")
 def get_cluster_user_page(request, id):
     return render(request, "graph_model/cluster-user.html", {"clusterID": id, "clusterSuccess": False})
 
 
-@user_passes_test(lambda user: user.is_staff, login_url='/admin')
+@login_required(login_url="/authentication/login")
 def get_process_graph(request):
     if (request.method == "POST"):
         startDate, endDate = get_period(request)
         touchpoints = get_list_touchpoints(startDate, endDate)
 
         if (len(touchpoints) == 0):
-            return render(request, "graph_model/visualize-graph.html", {"result": "No available touchpoints"})
+            return render(request, "graph_model/visualize-process-graph.html", {"result": "No available touchpoints"})
 
-        type = request.POST["algorithm"]
-
-        print(touchpoints)
-
+        type = request.POST["mining-algorithm"]
         graph = process_mining(touchpoints, type)
         graphLink = save_process_graph(graph, startDate, endDate, type)
-        return render(request, "graph_model/visualize-graph.html", {"imgSrc": graphLink})
+
+        return render(request, "graph_model/visualize-process-graph.html", {"imgSrc": graphLink, "mining_algorithms": mining_algorithms})
 
 
-@user_passes_test(lambda user: user.is_staff, login_url='/admin')
+@login_required(login_url="/authentication/login")
 def get_cluster_journey(request):
     if (request.method == "POST"):
         startDate, endDate = get_period(request)
         touchpoints = get_list_touchpoints(startDate, endDate)
         if (len(touchpoints) == 0):
-            return render(request, "graph_model/cluster-journey.html", {"result": "No available touchpoints"})
+            return render(request, "graph_model/trace-clustering.html", {"result": "No available touchpoints",
+                                                    "preprocessing_methods": preprocessing_methods,
+                                                    "clustering_algorithms": clustering_algorithms,
+                                                    "mining_algorithms": mining_algorithms})
 
         numClusters = int(request.POST["numClusters"])
         algorithm = request.POST["algorithmMethod"]
         preprocess = request.POST["preprocessMethod"]
         miningType = request.POST["miningAlgorithm"]
+
+        print(algorithm)
+
         user_journeys, customer_ids = create_journey(touchpoints)
         list_action_types = get_list_action_types(touchpoints)
         x_data = preprocess_touchpoint(
@@ -113,10 +251,13 @@ def get_cluster_journey(request):
                 graph, newClusterID, index, miningType)
             graphLinks.append(graphLink)
 
-        return render(request, "graph_model/cluster-journey.html", {"graphLinks": graphLinks})
+        return render(request, "graph_model/trace-clustering.html", {"graphLinks": graphLinks,
+                                                    "preprocessing_methods": preprocessing_methods,
+                                                    "clustering_algorithms": clustering_algorithms,
+                                                    "mining_algorithms": mining_algorithms})
 
 
-@user_passes_test(lambda user: user.is_staff, login_url='/admin')
+@login_required(login_url="/authentication/login")
 def get_cluster_user(request, id):
     if (request.method == "POST"):
         clusterID = id
@@ -124,7 +265,7 @@ def get_cluster_user(request, id):
         touchpoints = get_list_touchpoints(startDate, endDate)
 
         if (len(touchpoints) == 0):
-            return render(request, "graph_model/cluster-user.html", {"clusterID": clusterID, "result": "No available touchpoints"})
+            return render(request, "graph_model/cluster-customer.html", {"clusterID": clusterID, "result": "No available touchpoints"})
 
         clusterInfo = get_cluster_info(id)
         clusterGraphs = get_cluster_graphs(id)
@@ -156,9 +297,10 @@ def get_cluster_user(request, id):
             save_clustered_user(customer_id, startDate, endDate,
                               user_touchpoints, cluster_number_id)
 
-        return render(request, "graph_model/cluster-user.html", {"clusterID": clusterID, "clusterSuccess": True})
+        return render(request, "graph_model/cluster-customer.html", {"clusterID": clusterID, "clusterSuccess": True})
 
 
+@login_required(login_url="/authentication/login")
 def get_period(request):
     startDate = datetime(2000, 1, 1)
     endDate = datetime.now()
@@ -178,6 +320,7 @@ def get_list_touchpoints(startDate, endDate):
     return touchpoints
 
 
+
 def get_cluster_info(clusterId):
     clusterInfo = Journey_Cluster_Model.objects.filter(id=clusterId).values(
         'id', 'algorithm', 'preprocessing', 'preprocessingModelFile', 'clusterModelFile')
@@ -190,14 +333,17 @@ def get_cluster_graphs(clusterId):
     return list(clusterGraphs)
 
 
+
 def load_model(path):
     return joblib.load(path)
+
 
 
 def get_list_action_types(touchpoints):
     df = pd.DataFrame(touchpoints)
     list_action_types = df["action_type__name"].unique()
     return list_action_types
+
 
 
 def create_journey(touchpoints):
@@ -215,10 +361,11 @@ def create_journey(touchpoints):
     return list_journeys, list_userID
 
 
+
 def cluster_touchpoints(x_data, algorithm, numClusters):
-    if (algorithm == "kmeans"):
+    if (algorithm == "k-means"):
         model = kmeans_clustering(x_data, numClusters)
-    elif (algorithm == "kmodes"):
+    elif (algorithm == "k-modes"):
         model = kmodes_clustering(x_data, numClusters)
     return model
 
@@ -228,17 +375,19 @@ def kmeans_clustering(x_data, numClusters):
     return kmeans
 
 
+
 def kmodes_clustering(x_data, numClusters):
     kmodes = KModes(n_clusters=numClusters).fit(x_data)
     return kmodes
 
 
+
 def preprocess_touchpoint(user_journeys, list_action_types, preprocess):
     preprocessed_touchpoints = np.array([])
-    if (preprocess == "bagOfActivities"):
+    if (preprocess == "bag-of-activities"):
         preprocessed_touchpoints = preprocess_bag_of_activities(
             user_journeys, list_action_types)
-    if (preprocess == "sequenceVector"):
+    if (preprocess == "sequence-vector"):
         preprocessed_touchpoints = preprocess_sequence_vector(
             user_journeys, list_action_types)
     return preprocessed_touchpoints
@@ -361,9 +510,9 @@ def inductive_miner_petri_net(log):
 def predict_journey_cluster(algorithm, x_data, clusterModelFile):
     loaded_model = load_model(clusterModelFile)
 
-    if (algorithm == "kmeans"):
+    if (algorithm == "k-means"):
         clusters = loaded_model.cluster_centers_
-    elif (algorithm == "kmodes"):
+    elif (algorithm == "k-modes"):
         clusters = loaded_model.cluster_centroids_
 
     predict_journeys = loaded_model.predict(x_data)
@@ -394,7 +543,7 @@ def save_cluster_graph(gviz, clusterID, clusterNumber, type, clusterName=None):
 
     save_graph_file(type, gviz, static_path)
     newGraph = Clustered_Journey_Graph.objects.create(
-        clusterID=clusterID, clusterNumber=clusterNumber, clusterName=clusterName, type=type, link=link_url)
+        clusterModelID=clusterID, clusterNumber=clusterNumber, clusterName=clusterName, type=type, link=link_url)
     newGraph.save()
 
     return filename

@@ -1,0 +1,112 @@
+{% extends 'journey/index.html' %}
+
+{% block container %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'journey/css/base-dashboard.css' %}">
+    <div class="header">
+        <div class="vertical-div left-header">
+            <a href="/journey/home" style="width:100%;display:flex;vertical-align:middle;">
+                <img src="{% static '/journey/images/logo-journey.svg' %}" id="img-logo"/>
+            </a>
+        </div>
+        <div class="vertical-div center-header" onclick=>
+            Django Entreprise
+        </div>
+        <div class="right-header">
+            <div class="dropdown-btn vertical-div">staff, {{ user.get_username }}</div>
+            <div class="dropdown-content">
+                <div class="dropdown-li"><a href="#" class="border-bottom vertical-div">Profile</a></div>
+                <div class="dropdown-li"><a href="/authentication/logout" class="vertical-div">Log Out</a></div>
+            </div>
+        </div>
+    </div>
+    <div class="center">
+        <div class="center-left">
+            <div class="outer">
+                <div class="dropdown-menu-container">
+                    <a href="/journey/home" class="dropdown-menu-item vertical-div">
+                        <img src="{% static '/journey/images/menu.svg' %}" />
+                        <div>Dashboard</div>
+                    </a>
+                </div>
+                <div class="dropdown-menu-container">
+                    <div class="dropdown-menu-item vertical-div" id="table-btn">
+                        <img src="{% static '/journey/images/database.svg' %}" />
+                        <div>Database</div>
+                    </div>
+                    <div class="sub-dropdown-menu" id="table-subclass">
+                        <a href="/journey/table/action_type">Action type</a>
+                        <a href="/journey/table/channel_type">Channel type</a>
+                        <a href="/journey/table/device_browser">Device browser</a>
+                        <a href="/journey/table/device_category">Device category</a>
+                        <a href="/journey/table/device_os">Device os</a>
+                        <a href="/journey/table/experience_emotion">Experience emotion</a>
+                        <a href="/journey/table/interact_item_type">Interact item type</a>
+                        <a href="/journey/table/journey_customer">Journey customer</a>
+                        <a href="/journey/table/matching_column">Mapping file</a>
+                        <a href="/journey/table/matching_report">Mapping data source</a>
+                        <a href="/journey/table/source_type">Source type</a>
+                        <a href="/journey/table/touchpoint">Touchpoint</a>
+                    </div>
+                </div>
+                <div class="dropdown-menu-container">
+                    <div class="dropdown-menu-item vertical-div" id="discovery-btn">
+                        <img src="{% static '/journey/images/discover.svg' %}" />
+                        <div>Discovery data</div>
+                    </div>
+                    <div class="sub-dropdown-menu" id="discovery-subclass">
+                        <a href="/graph_model/table/journey_process_graph">Process graph</a>
+                        <a href="/graph_model/table/clustered_journey_graph">Clustered process graph</a>
+                        <a href="/graph_model/table/journey_cluster_model">Journey cluster model</a>
+                        <a href="/graph_model/table/clustered_customer">Clustered Customers</a>
+                    </div>
+                </div>
+                <div class="dropdown-menu-container">
+                    <div class="dropdown-menu-item vertical-div" id="import-btn">
+                        <img src="{% static '/journey/images/import.svg' %}" />
+                        <div>Import</div>
+                    </div>
+                    <div class="sub-dropdown-menu" id="import-subclass">
+                        <a href="/journey/import/create-mapping-file" >Create mapping file</a>
+                        <a href="/journey/import/review-mapping-file" >Review mapping file</a>
+                        <a href="/journey/import/upload-file" >Import CSV file</a>
+                    </div>
+                </div>
+                <div class="dropdown-menu-container">
+                    <div class="dropdown-menu-item vertical-div" id="analytics-btn">
+                        <img src="{% static '/journey/images/analytics.svg' %}" />
+                        <div>Analytics</div>
+                    </div>
+                    <div class="sub-dropdown-menu" id="analytics-subclass">
+                        <a href="/graph_model/analytics/visualize-process-graph" >Visualize journey</a>
+                        <a href="/graph_model/analytics/trace-clustering" >Trace clustering</a>
+                    </div>
+                </div>
+                <div class="dropdown-menu-container">
+                    <a href="/" class="dropdown-menu-item vertical-div">
+                        <img src="{% static '/journey/images/pie-chart.svg' %}" />
+                        <div>Report</div>
+                    </a>
+                </div>
+                <div class="dropdown-menu-container">
+                    <a href="/" class="dropdown-menu-item vertical-div">
+                        <img src="{% static '/journey/images/copy.svg' %}" />
+                        <div>Documentation</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="center-right">
+            <div id="title-txt">Daily Dashboard</div>
+            {% block content %}
+            {% endblock %}
+        </div>
+        <div id="loading-modal" style="display:none">
+            <svg class="loading-svg">
+                <circle cx="25" cy="25" r="21" id="loading-circle"></circle>
+            </sv>
+        </div>
+    </div>
+    <div class="footer"></div>
+    <script  type="text/javascript" src="{% static '/journey/js/base-dashboard.js' %}"></script> 
+{% endblock %}

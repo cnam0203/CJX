@@ -1,0 +1,125 @@
+* { 
+    -moz-box-sizing: border-box; 
+    -webkit-box-sizing: border-box; 
+     box-sizing: border-box; 
+}
+
+.import-container{
+    z-index: 1;
+    flex-grow : 1;
+    display: flex;
+    vertical-align: middle;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 90%;
+    margin: 30px auto;
+    box-shadow: 0px 4px 3px #d1d1d1;
+    background-color: #ffffff;
+    border-radius: 20px;
+}
+
+.import-wrapper{
+    text-align: center;
+    width: 100%;
+}
+
+.stage {
+    display: flex;
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+.import-icon {
+    align-self: flex-end;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    width: 30px;
+    margin: 0 auto 0 auto;
+    transform-origin: bottom;
+}
+
+.bounce-2 {
+    animation-name: bounce-2;
+    animation-timing-function: ease;
+}
+
+@keyframes bounce-2 {
+    0%   { transform: translateY(0); }
+    50%  { transform: translateY(-20px); }
+    100% { transform: translateY(0); }
+}
+
+.form-btn {
+    border: 1px #707070 solid;
+    background-color: #ffffff;
+    color: #FF8484;
+    padding: 10px 15px;
+    border-radius: 25px;
+    font-size: 15px;
+    font-family: 'American Typewriter';
+    display: block;
+    margin: 10px auto 20px auto;
+}
+
+.form-btn:hover {
+    cursor: pointer;
+    border: 0;
+    background-color: #FF8484;
+    color: #ffffff;
+}
+
+.btn-container {
+    text-align: center;
+}
+
+#file-container {
+    width: 100%;
+    overflow-x: scroll;
+}
+
+.mapping-container {
+    width: 50%;
+    margin: 20px auto;
+    background-color: #EFEFEF;
+    border: 0px;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+}
+
+.mapping-type {
+    width: 50%;
+    font-size: 15px;
+    color: #292929;
+}
+
+.mapping-select {
+    width: 50%;
+    font-size: 15px;
+    color: #292929;
+    font-family: 'American Typewriter';
+}
+
+.mapping-choice {
+    font-size: 15px;
+    color: #292929;
+    font-family: 'American Typewriter';
+}
+
+#tbl-csv-data {
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+}
+
+th {
+    font-weight: 400;
+    font-size: 16px;
+}
+
+td {
+    font-family: 'Avenir';
+}

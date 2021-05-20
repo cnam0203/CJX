@@ -15,18 +15,22 @@ const submitBtn = document.getElementById('submit-file');
 function importFile(allFields, allMatchedColumns) {
   refreshUpload();
 
-  const inputFile = document.getElementById('upload-csv').files[0];
-  const report = document.getElementById('report');
+  if (document.getElementById('upload-csv').files.length == 1) {
+    const inputFile = document.getElementById('upload-csv').files[0];
+    const report = document.getElementById('report');
+    const importContainer = document.getElementById('import-container');
 
-  mappingTypeDiv.style.display = 'block';
-  submitBtn.style.display = 'inline-block';
+    importContainer.className += ' border-container';
+    mappingTypeDiv.style.display = 'block';
+    submitBtn.style.display = 'inline-block';
 
-  touchpointFields = allFields;
-  matchedColumns = allMatchedColumns;
-  report.value = '';
+    touchpointFields = allFields;
+    matchedColumns = allMatchedColumns;
+    report.value = '';
 
-  if (checkCSVFile(inputFile)) importCSV(inputFile);
-  else importJSON(inputFile);
+    if (checkCSVFile(inputFile)) importCSV(inputFile);
+    else importJSON(inputFile);
+  }
 }
 
 function importCSV(inputFile) {
@@ -303,7 +307,7 @@ function matchColumn(e) {
 
   if (targetColumn != 'None') {
     matchColumns[targetColumn] = currentColumn;
-    changeHeaderBackgroundColor(currentColumn, '#ffffff', '#8de089');
+    changeHeaderBackgroundColor(currentColumn, '#ffffff', '#FF8484');
   } else {
     changeHeaderBackgroundColor(currentColumn, '#666', '#f8f8f8');
   }
@@ -360,6 +364,9 @@ function submitTouchpoint() {
     alert('No data to import');
     return;
   }
+
+  const loadingModal = document.getElementById('loading-modal');
+  loadingModal.style.display = 'flex';
 
   const csrftoken = getCookie('csrftoken');
   fetch('/admin/journey/upload-touchpoint', {
