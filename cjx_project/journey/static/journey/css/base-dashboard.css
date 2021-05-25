@@ -19,9 +19,9 @@
 .vertical-div {
     height: 100%;
     vertical-align: middle;
-    display: flex;
     justify-content: center;
     align-items: center;
+    display: flex;
 }
 
 .left-header {

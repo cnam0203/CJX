@@ -1,7 +1,7 @@
 from django import forms
 from .models import Touchpoint
 from .models import Channel_Type
-from .models import Source_Type
+from .models import Traffic_Source_Type
 from .models import Device_Browser
 from .models import Device_Category
 from .models import Device_OS
@@ -24,7 +24,7 @@ class Channel_Type_Form(forms.ModelForm):
 
 class Source_Type_Form(forms.ModelForm):
     class Meta:
-        model = Source_Type
+        model = Traffic_Source_Type
         fields = '__all__'
 
 class Device_Category_Form(forms.ModelForm):

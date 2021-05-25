@@ -10,7 +10,7 @@ from .models import Device_OS
 from .models import Device_Category
 from .models import Interact_Item_Type
 from .models import Experience_Emotion
-from .models import Source_Type
+from .models import Traffic_Source_Type
 from .models import Action_Type
 from .models import Journey_Customer
 from .models import Matching_Column
@@ -21,8 +21,8 @@ from .models import Matching_Report
 class TouchpointAdmin(admin.ModelAdmin):
     search_fields = ("action_type", "channel_type",
                      "customer_id", "device_category")
-    list_display = ("id", "customer", "visit_time", "geo_continent", "geo_country", "action_type",
-                    "channel_type", "device_category", "source_name", "interact_item", "experience_emotion")
+    list_display = ("id", "customer", "time", "geo_continent", "geo_country", "action_type",
+                    "channel_type", "device_category", "traffic_source_name", "interact_item", "experience_emotion")
 
     def interact_item(self, obj):
         if (obj.interact_item_type and obj.interact_item_id):
@@ -77,7 +77,7 @@ class Matching_Column_Admin(admin.ModelAdmin):
 admin.site.register(Touchpoint, TouchpointAdmin)
 admin.site.register(Channel_Type, Channel_Type_Admin)
 admin.site.register(Action_Type, Action_Type_Admin)
-admin.site.register(Source_Type, Source_Type_Admin)
+admin.site.register(Traffic_Source_Type, Source_Type_Admin)
 admin.site.register(Device_Browser, Device_Browser_Admin)
 admin.site.register(Device_Category, Device_Category_Admin)
 admin.site.register(Device_OS, Device_OS_Admin)

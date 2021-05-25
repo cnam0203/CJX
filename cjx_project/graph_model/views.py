@@ -313,8 +313,8 @@ def get_period(request):
 
 
 def get_list_touchpoints(startDate, endDate):
-    touchpoints = Touchpoint.objects.filter(visit_time__range=[startDate, endDate]).values(
-        'customer_id', 'visit_time', 'action_type__name')
+    touchpoints = Touchpoint.objects.filter(time__range=[startDate, endDate]).values(
+        'customer_id', 'time', 'action_type__name')
     touchpoints = list(touchpoints)
 
     return touchpoints
@@ -328,7 +328,7 @@ def get_cluster_info(clusterId):
 
 
 def get_cluster_graphs(clusterId):
-    clusterGraphs = Clustered_Journey_Graph.objects.filter(clusterID=clusterId).values(
+    clusterGraphs = Clustered_Journey_Graph.objects.filter(clusterModelID=clusterId).values(
         'id', 'clusterNumber', 'clusterName', 'link')
     return list(clusterGraphs)
 
@@ -352,9 +352,9 @@ def create_journey(touchpoints):
     list_userID = df["customer_id"].unique()
     for userID in list_userID:
         user_journey = df.loc[df["customer_id"] ==
-                              userID, ["action_type__name", "visit_time"]]
+                              userID, ["action_type__name", "time"]]
         user_journey = user_journey.sort_values(
-            ['visit_time'], ascending=[True])
+            ['time'], ascending=[True])
         user_journey = user_journey["action_type__name"].tolist()
         list_journeys.append(user_journey)
 
@@ -423,10 +423,10 @@ def preprocess_sequence_vector(user_journeys, list_action_types):
 
 def process_mining(touchpoints, type):
     df = pd.DataFrame(touchpoints)
-    df["visit_time"] = pd.to_datetime(df['visit_time'], unit='s')
+    df["time"] = pd.to_datetime(df['time'], unit='s')
     df = dataframe_utils.convert_timestamp_columns_in_df(df)
     df.rename(columns={'customer_id': 'case:concept:name',
-              'action_type__name': 'concept:name', 'visit_time': 'time:timestamp'}, inplace=True)
+              'action_type__name': 'concept:name', 'time': 'time:timestamp'}, inplace=True)
     df = df.sort_values(by=['case:concept:name', 'time:timestamp'])
     log = log_converter.apply(df)
 
@@ -542,8 +542,7 @@ def save_cluster_graph(gviz, clusterID, clusterNumber, type, clusterName=None):
     save_graph_file(type, gviz, static_path)
 
     save_graph_file(type, gviz, static_path)
-    newGraph = Clustered_Journey_Graph.objects.create(
-        clusterModelID=clusterID, clusterNumber=clusterNumber, clusterName=clusterName, type=type, link=link_url)
+    newGraph = Clustered_Journey_Graph.objects.create(clusterModelID=clusterID, clusterNumber=clusterNumber, clusterName=clusterName, type=type, link=link_url)
     newGraph.save()
 
     return filename

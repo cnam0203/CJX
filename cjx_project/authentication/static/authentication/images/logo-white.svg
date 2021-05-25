@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="696" height="229.5" viewBox="0 0 696 229.5">
+  <defs>
+    <style>
+      .cls-1, .cls-4, .cls-6 {
+        fill: none;
+      }
+
+      .cls-1 {
+        stroke: #f06969;
+        stroke-width: 20px;
+      }
+
+      .cls-2 {
+        fill: #f06969;
+        font-size: 70px;
+        font-family: AmericanTypewriter-Light, American Typewriter;
+        font-weight: 300;
+      }
+
+      .cls-3 {
+        fill: #fff;
+        font-size: 90px;
+        font-family: AmericanTypewriter-Bold, American Typewriter;
+        font-weight: 700;
+      }
+
+      .cls-4 {
+        stroke: #fff;
+        stroke-width: 10px;
+      }
+
+      .cls-5 {
+        stroke: none;
+      }
+    </style>
+  </defs>
+  <g id="Group_7" data-name="Group 7" transform="translate(-191 -189.5)">
+    <g id="Group_6" data-name="Group 6" transform="translate(191 191)">
+      <g id="Ellipse_1" data-name="Ellipse 1" class="cls-1" transform="translate(0 161)">
+        <ellipse class="cls-5" cx="31.5" cy="33.5" rx="31.5" ry="33.5"/>
+        <ellipse class="cls-6" cx="31.5" cy="33.5" rx="21.5" ry="23.5"/>
+      </g>
+      <g id="Ellipse_2" data-name="Ellipse 2" class="cls-1" transform="translate(56 40)">
+        <ellipse class="cls-5" cx="31.5" cy="33.5" rx="31.5" ry="33.5"/>
+        <ellipse class="cls-6" cx="31.5" cy="33.5" rx="21.5" ry="23.5"/>
+      </g>
+      <g id="Ellipse_3" data-name="Ellipse 3" class="cls-1" transform="translate(125 119)">
+        <ellipse class="cls-5" cx="32" cy="33.5" rx="32" ry="33.5"/>
+        <ellipse class="cls-6" cx="32" cy="33.5" rx="22" ry="23.5"/>
+      </g>
+      <g id="Ellipse_4" data-name="Ellipse 4" class="cls-1" transform="translate(193 0)">
+        <ellipse class="cls-5" cx="31.5" cy="33.5" rx="31.5" ry="33.5"/>
+        <ellipse class="cls-6" cx="31.5" cy="33.5" rx="21.5" ry="23.5"/>
+      </g>
+      <line id="Line_1" data-name="Line 1" class="cls-1" y1="65.14" x2="30.674" transform="translate(44.574 101.273)"/>
+      <line id="Line_2" data-name="Line 2" class="cls-1" x2="32.591" y2="34.606" transform="translate(105.922 95.166)"/>
+      <line id="Line_3" data-name="Line 3" class="cls-1" y1="71.247" x2="38.343" transform="translate(173.022 58.524)"/>
+    </g>
+    <text id="Customer_journey_master" data-name="Customer
+journey
+master" class="cls-2" transform="translate(527 190)"><tspan x="16.865" y="62">Customer</tspan><tspan class="cls-3"><tspan x="4.68" y="132">journey</tspan></tspan><tspan x="61.455" y="202">master</tspan></text>
+    <path id="Path_1" data-name="Path 1" class="cls-4" d="M0,0V229" transform="translate(483.5 189.5)"/>
+  </g>
+</svg>

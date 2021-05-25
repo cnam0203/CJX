@@ -7,15 +7,19 @@ from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.geoip2 import GeoIP2
+from django.db.models import Count
 
-from .models import Touchpoint, Journey_Customer, Action_Type, Channel_Type, Source_Type, Device_Browser, Device_OS, Device_Category, Device_Category, Interact_Item_Type, Experience_Emotion, Matching_Report, Matching_Column
+from .models import Touchpoint, Journey_Customer, Action_Type, Channel_Type, Traffic_Source_Type, Device_Browser, Device_OS, Device_Category, Device_Category, Interact_Item_Type, Experience_Emotion, Matching_Report, Matching_Column
 from .forms import Touchpoint_Form, Journey_Customer_Form, Action_Type_Form, Channel_Type_Form, Source_Type_Form, Device_Browser_Form, Device_OS_Form, Device_Category_Form, Interact_Item_Type_Form, Experience_Emotion_Form, Matching_Report_Form, Matching_Column_Form
 
 from utils.path_helper import get_static_path
 from utils.copy_object import copy_object
 from datetime import datetime
+from datetime import date
+
 
 import json
+from json import dumps
 import os
 
 # Create your views here.
@@ -25,7 +29,7 @@ formData = {
     'journey_customer': Journey_Customer_Form,
     'action_type': Action_Type_Form,
     'channel_type': Channel_Type_Form,
-    'source_type': Source_Type_Form,
+    'traffic_source_type': Source_Type_Form,
     'device_browser': Device_Browser_Form,
     'device_os': Device_OS_Form,
     'device_category': Device_Category_Form,
@@ -38,13 +42,38 @@ formData = {
 
 @login_required(login_url="/authentication/login")
 def home(request):
-    return render(request, "journey/home.html", {'activities':[
-            {'customerID': '123456', 'visitTime': '2020-01-01', 'actionType': 'purchase', 'channelType': 'web', 'device': 'iOS', 'experience': 'happy'},
-            {'customerID': '123456', 'visitTime': '2020-01-01', 'actionType': 'purchase', 'channelType': 'web', 'device': 'iOS', 'experience': 'happy'},
-            {'customerID': '123456', 'visitTime': '2020-01-01', 'actionType': 'purchase', 'channelType': 'web', 'device': 'iOS', 'experience': 'happy'},
-            {'customerID': '123456', 'visitTime': '2020-01-01', 'actionType': 'purchase', 'channelType': 'web', 'device': 'iOS', 'experience': 'happy'},
-            {'customerID': '123456', 'visitTime': '2020-01-01', 'actionType': 'purchase', 'channelType': 'web', 'device': 'iOS', 'experience': 'happy'}
-        ]
+    total_customer = len(Journey_Customer.objects.values('customerID').distinct())
+    new_customer = len(Journey_Customer.objects.filter(register_date__year=date.today().year,
+                                                        register_date__month=date.today().month,
+                                                        register_date__day=date.today().day).values('customerID').distinct())
+    activites = list(Touchpoint.objects.order_by('-time').values('customer_id', 'time', 'action_type__name', 'channel_type__name', 'device_category__name', 'experience_emotion')[:5])
+    
+    total_usage = len(Touchpoint.objects.all())
+
+    device_category_usage = list(Touchpoint.objects.all().values('device_category__name').annotate(total=Count('device_category__name')))
+    if (device_category_usage[0]['device_category__name'] == 'None' and device_category_usage[0]['total'] == 0):
+        device_category_data = []
+    else:
+        device_category_data = [[device['device_category__name'],(device['total']/total_usage)*100] for device in device_category_usage]
+
+    channel_type_usage = list(Touchpoint.objects.all().values('channel_type__name').annotate(total=Count('channel_type__name')))
+    if (channel_type_usage[0]['channel_type__name'] == 'None' and channel_type_usage[0]['total'] == 0):
+        channel_type_data = []
+    else:
+        channel_type_data = [{'name': channel['channel_type__name'], 'y': (channel['total']/total_usage)*100} for channel in channel_type_usage]
+
+    event_usage = list(Touchpoint.objects.all().values('action_type__name').annotate(total=Count('action_type__name')))
+    if (event_usage[0]['action_type__name'] == 'None' and event_usage[0]['total'] == 0):
+        event_data = []
+    else:
+        event_data = [[event['action_type__name'],(event['total']/total_usage)*100] for event in event_usage]
+
+    return render(request, "journey/home.html", {'activities': activites, 
+                                'total_customer': total_customer, 
+                                'new_customer': new_customer,
+                                'device_category_data': dumps(device_category_data),
+                                'channel_type_data': dumps(channel_type_data),
+                                'event_data': dumps(event_data)
     })
 
 
@@ -111,12 +140,14 @@ def get_list_data(request, tablename):
     headers = []
 
     if (tablename == 'touchpoint'):
-        data = list(Model.objects.all().values('id', 'customer_id', 'action_type__name', 'visit_time', 'channel_type__name',
+        data = list(Model.objects.all().values('id', 'customer_id', 'action_type__name', 'time', 'channel_type__name',
                     'device_browser__name', 'device_os__name', 'device_category__name', 'geo_continent',
-                    'geo_country', 'geo_city', 'interact_item_type__name', 'interract_item_content', 'experience_emotion__name'))
-        headers = ['id', 'customer_id', 'action_type', 'visit_time', 'channel_type',
-                    'device_browser', 'device_os', 'device_category', 'geo_continent',
-                    'geo_country', 'geo_city', 'interact_item_type', 'interract_item_content', 'experience_emotion']
+                    'geo_country', 'geo_city', 'interact_item_type__name', 'interact_item_content',
+                    'experience_emotion__name'))
+        headers = ['id', 'customer_id', 'action_type', 'time', 'channel_type',
+                    'browser', 'os', 'device_category', 'geo_continent',
+                    'geo_country', 'geo_city', 'interact_item_type', 'interact_item_content',
+                    'experience']
         new_data = data
     elif (tablename == 'matching_report'):
         data = list(Model.objects.all().values())
@@ -299,8 +330,8 @@ def create_new_touchpoint(touchpoint):
             continue
         if key == "action_type":
             new_value = get_or_none(Action_Type, value, key)
-        elif key == "source_name":
-            new_value = get_or_none(Source_Type, value, key)
+        elif key == "traffic_source_name":
+            new_value = get_or_none(Traffic_Source_Type, value, key)
         elif key == "channel_type":
             new_value = get_or_none(Channel_Type, value, key)
         elif key == "device_browser":
@@ -334,8 +365,6 @@ def get_or_none(classmodel, name, column):
         obj = classmodel.objects.create(name=name)
         obj.save()
         return obj
-
-
 
 
 def read_detail_instruction(request, datasrc):

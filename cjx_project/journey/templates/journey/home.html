@@ -24,21 +24,21 @@
                     </div>
                     {% for activity in activities %}
                         <div class="table-row">
-                            <div class="table-column" style='font-weight: bold'>{{ activity.customerID }}</div>
-                            <div class="table-column" style='color:#938F60'>{{ activity.visitTime }}</div>
+                            <div class="table-column" style='font-weight: bold'>{{ activity.customer_id }}</div>
+                            <div class="table-column" style='color:#938F60'>{{ activity.time }}</div>
                             <div class="table-column" >
                                 <div class="row-field" style='background-color:#FF8965'>
-                                    {{ activity.actionType }}
+                                    {{ activity.action_type__name }}
                                 </div>
                             </div>
                             <div class="table-column" >
                                 <div class="row-field" style='background-color:#FFC465'>
-                                    {{ activity.channelType }}
+                                    {{ activity.channel_type__name }}
                                 </div>
                             </div>
                             <div class="table-column" >
                                 <div class="row-field" style='background-color:#FFF733'>
-                                    {{ activity.device }}
+                                    {{ activity.device_category_name }}
                                 </div>
                             </div>
                             <div class="table-column" >{{ activity.experience }}</div>
@@ -48,228 +48,179 @@
             </div>
             <div class="number-user" data-aos="fade-left">
                 <div class="number-user-container"  id="number-user-above">
-                    <p style='color: #F06969; font-size: 30px; font-weight: 400; margin: 15px 0px'>1234567</p>
-                    <p style='font-size: 25px; font-weight: 400; margin: 15px 0px'>Total users</p>
+                    <p style='color: #F06969; font-size: 30px; font-weight: 400; margin: 15px 0px'>{{ total_customer }}</p>
+                    <p style='font-size: 25px; font-weight: 400; margin: 15px 0px'>Total customers</p>
                 </div>
                 <div class="number-user-container">
-                    <p style='color: #F06969; font-size: 30px; font-weight: 400; margin: 15px 0px'>2000+</p>
-                    <p style='font-size: 25px; font-weight: 400; margin: 15px 0px'>New users</p>
+                    <p style='color: #F06969; font-size: 30px; font-weight: 400; margin: 15px 0px'>{{ new_customer }}</p>
+                    <p style='font-size: 25px; font-weight: 400; margin: 15px 0px'>New daily customers</p>
                 </div>
             </div>
         </div>
         <div class="chart-container">
-            <div class="chart" data-aos="fade-up">
+            <div class="chart">
                 <p class="chart-name">Action Type</p>
                 <div id="action-chart"></div>
             </div>
-            <div class="chart" style="color: #EA3939" data-aos="fade-up" data-aos-delay="500">
+            <div class="chart" style="color: #EA3939">
                 <p class="chart-name">Channel</p>
                 <div id="channel-chart"></div>
             </div>
-            <div class="chart" data-aos="fade-up" data-aos-delay="1000">
+            <div class="chart">
                 <p class="chart-name">Device</p>
                 <div id="device-chart"></div>
             </div>
         </div>
     </div>
     <script>
-        Highcharts.chart('action-chart', {
-            chart: {
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false,
-                type: 'pie'
-            },
-            title: {
-                text: 'Browser market shares in January, 2018'
-            },
-            tooltip: {
-                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-            },
-            accessibility: {
-                point: {
-                    valueSuffix: '%'
-                }
-            },
-            plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    dataLabels: {
-                        enabled: false
-                    },
-                    showInLegend: true
-                }
-            },
-            series: [{
-                name: 'Brands',
-                colorByPoint: true,
-                data: [{
-                    name: 'Chrome',
-                    y: 61.41,
-                    sliced: true,
-                    selected: true
-                }, {
-                    name: 'Internet Explorer',
-                    y: 11.84
-                }, {
-                    name: 'Firefox',
-                    y: 10.85
-                }, {
-                    name: 'Edge',
-                    y: 4.67
-                }, {
-                    name: 'Safari',
-                    y: 4.18
-                }, {
-                    name: 'Other',
-                    y: 7.05
-                }]
-            }],
-            exporting: {
-                enabled: false
-            }
-        });
+        var device_category_data = JSON.parse("{{device_category_data|escapejs}}");
+        var channel_type_data = JSON.parse("{{channel_type_data|escapejs}}");
+        var event_data = JSON.parse("{{event_data|escapejs}}");
 
-        Highcharts.chart('device-chart', {
-            chart: {
-                plotBackgroundColor: null,
-                plotBorderWidth: 0,
-                plotShadow: false
-            },
-            title: {
-                text: ''
-            },
-            tooltip: {
-                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-            },
-            accessibility: {
-                point: {
-                    valueSuffix: '%'
-                }
-            },
-            plotOptions: {
-                pie: {
-                    dataLabels: {
-                        enabled: true,
-                        distance: -50,
-                        style: {
-                            fontWeight: 'bold',
-                            color: 'white'
-                        }
-                    },
-                    startAngle: -90,
-                    endAngle: 90,
-                    center: ['50%', '75%'],
-                    size: '110%',
-                    showInLegend: true
-                }
-            },
-            series: [{
-                type: 'pie',
-                name: 'Browser share',
-                innerSize: '50%',
-                data: [
-                    ['Chrome', 58.9],
-                    ['Firefox', 13.29],
-                    ['Internet Explorer', 13],
-                    ['Edge', 3.78],
-                    ['Safari', 3.42],
-                    {
-                        name: 'Other',
-                        y: 7.61,
+        if (event_data.length > 0) {
+            console.log(event_data)
+            Highcharts.chart('action-chart', {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Browser market shares in January, 2018'
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                accessibility: {
+                    point: {
+                        valueSuffix: '%'
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
                         dataLabels: {
                             enabled: false
-                        }
+                        },
+                        showInLegend: true
                     }
-                ]
-            }],
-            exporting: {
-                enabled: false
-            }
-        });
-
-        Highcharts.chart('channel-chart', {
-            chart: {
-                type: 'column'
-            },
-            title: {
-                text: ''
-            },
-            accessibility: {
-                announceNewData: {
-                    enabled: true
-                }
-            },
-            xAxis: {
-                type: 'category'
-            },
-            yAxis: {
-                title: {
-                    text: 'Total percent market share'
-                }
-
-            },
-            legend: {
-                enabled: false
-            },
-            plotOptions: {
-                series: {
-                    borderWidth: 0,
-                    dataLabels: {
-                        enabled: true,
-                        format: '{point.y:.1f}%'
-                    },
-                    showInLegend: true
-                }
-            },
-
-            tooltip: {
-                headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
-            },
-
-            series: [
-                {
-                    name: "Browsers",
+                },
+                series: [{
+                    name: 'Brands',
                     colorByPoint: true,
-                    data: [
-                        {
-                            name: "Chrome",
-                            y: 62.74,
-                        },
-                        {
-                            name: "Firefox",
-                            y: 10.57,
-                        },
-                        {
-                            name: "Internet Explorer",
-                            y: 7.23,
-                        },
-                        {
-                            name: "Safari",
-                            y: 5.58,
-                        },
-                        {
-                            name: "Edge",
-                            y: 4.02,
-                        },
-                        {
-                            name: "Opera",
-                            y: 1.92,
-                        },
-                        {
-                            name: "Other",
-                            y: 7.62,
-                        }
-                    ]
+                    data: event_data
+                }],
+                exporting: {
+                    enabled: false
                 }
-            ],
+            });
+        }
 
-            exporting: {
-                enabled: false
-            }
-        })
+        if (device_category_data.length > 0) {
+            console.log(device_category_data)
+            Highcharts.chart('device-chart', {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: 0,
+                    plotShadow: false
+                },
+                title: {
+                    text: ''
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                accessibility: {
+                    point: {
+                        valueSuffix: '%'
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        dataLabels: {
+                            enabled: true,
+                            distance: -50,
+                            style: {
+                                fontWeight: 'bold',
+                                color: 'white'
+                            }
+                        },
+                        startAngle: -90,
+                        endAngle: 90,
+                        center: ['50%', '75%'],
+                        size: '110%',
+                        showInLegend: true
+                    }
+                },
+                series: [{
+                    type: 'pie',
+                    name: 'Browser share',
+                    innerSize: '50%',
+                    data: device_category_data
+                }],
+                exporting: {
+                    enabled: false
+                }
+            });
+        }
+
+        if (channel_type_data.length > 0) {
+            console.log(channel_type_data)
+            Highcharts.chart('channel-chart', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: ''
+                },
+                accessibility: {
+                    announceNewData: {
+                        enabled: true
+                    }
+                },
+                xAxis: {
+                    type: 'category'
+                },
+                yAxis: {
+                    title: {
+                        text: 'Total percent market share'
+                    }
+
+                },
+                legend: {
+                    enabled: false
+                },
+                plotOptions: {
+                    series: {
+                        borderWidth: 0,
+                        dataLabels: {
+                            enabled: true,
+                            format: '{point.y:.1f}%'
+                        },
+                        showInLegend: true
+                    }
+                },
+
+                tooltip: {
+                    headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                    pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
+                },
+
+                series: [
+                    {
+                        name: "Device",
+                        colorByPoint: true,
+                        data: channel_type_data
+                    }
+                ],
+
+                exporting: {
+                    enabled: false
+                }
+            })
+        }
     </script>
     <script>
         AOS.init({duration: 1500,});

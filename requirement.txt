@@ -5,3 +5,5 @@ numpy
 sklearn
 pandas
 kmodes
+django-datetimepicker
+django-user-agents

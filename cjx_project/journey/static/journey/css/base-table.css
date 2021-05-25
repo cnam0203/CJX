@@ -79,16 +79,16 @@
 }
 
 .table-content {
-    margin: auto;
+    width: 100%;
     overflow-x: scroll;
     text-align: center;
     font-family: 'Avenir';
 }
 
 .table-header {
-    width: 100%;
     margin: auto;
     margin-bottom: 15px;
+    width: 100%;
     display: flex;
 }
 
