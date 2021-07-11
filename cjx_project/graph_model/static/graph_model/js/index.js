@@ -46,3 +46,17 @@ function validateClusterForm() {
   const loadingModal = document.getElementById('loading-modal');
   loadingModal.style.display = 'flex';
 }
+
+// eslint-disable-next-line require-jsdoc
+function validateDecisionForm() {
+  // eslint-disable-next-line max-len
+  const startDate = Date.parse(document.forms['decisionForm']['startDate'].value);
+  const endDate = Date.parse(document.forms['decisionForm']['endDate'].value);
+  if (startDate > endDate) {
+    alert('Start date must be earlier than end date !');
+    return false;
+  }
+
+  const loadingModal = document.getElementById('loading-modal');
+  loadingModal.style.display = 'flex';
+}

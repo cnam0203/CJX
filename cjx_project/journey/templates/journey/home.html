@@ -38,7 +38,7 @@
                             </div>
                             <div class="table-column" >
                                 <div class="row-field" style='background-color:#FFF733'>
-                                    {{ activity.device_category_name }}
+                                    {{ activity.device_category__name }}
                                 </div>
                             </div>
                             <div class="table-column" >{{ activity.experience }}</div>
@@ -78,7 +78,6 @@
         var event_data = JSON.parse("{{event_data|escapejs}}");
 
         if (event_data.length > 0) {
-            console.log(event_data)
             Highcharts.chart('action-chart', {
                 chart: {
                     plotBackgroundColor: null,
@@ -119,7 +118,6 @@
         }
 
         if (device_category_data.length > 0) {
-            console.log(device_category_data)
             Highcharts.chart('device-chart', {
                 chart: {
                     plotBackgroundColor: null,

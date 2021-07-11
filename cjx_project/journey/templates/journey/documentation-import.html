@@ -1,0 +1,40 @@
+{% extends 'journey/base-dashboard.html' %}
+
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'journey/css/documentation.css' %}">
+    <div class="documentation-container">
+        <div class="documentation-name">Documentation - Import</div>
+        <div id="content-container">
+            <p class="header-content">1.  Import a touchpoint:</p>
+            <p class="main-content">Following these steps: </p>
+            <ul>
+                <li class="list-content">Step 1: Click Database button on the left column</li>
+                <li class="list-content">Step 2: Click Touchpoint button</li>
+                <li class="list-content">Step 3: Click Add New Item on the top right region</li>
+                <li class="list-content">Step 4: Input and Click Save button</li>
+                <li class="list-content">Optional : With fields that suggest multiple choices (Action_Type, Device_OS,... ), user can provide more choices by Add New Item for those fields in corresponding tables</li>
+            </ul>
+            <p class="header-content">2.  Import multiple touchpoints (CSV File):</p>
+            <p class="main-content">Following these steps: </p>
+            <ul>
+                <li class="list-content">Step 1: Click Import button on the left column</li>
+                <li class="list-content">Step 2: Click Create mapping file button</li>
+                <li class="list-content">Step 3: Input names of matching columns and their converting functions</li>
+                <li class="list-content">Step 4: Click Import CSV File button</li>
+                <li class="list-content">Step 5: Click Upload CSV File button and pick one CSV file</li>
+                <li class="list-content">Step 6: Select Mapping Type: defined mapping file or manually mapping (manipulate)</li>
+                <li class="list-content">Step 7: If user select "Manipulate",must match each column in CSV to each field in Data Model</li>
+                <li class="list-content">Step 8: Click Import button and wait until finishing</li>
+            </ul>
+        </div>
+        <div id="content-footer">
+            <div id="left-footer">
+                <a class="url" href={{ previous_href }}>&#8592; {{ previous_content }}</a>
+            </div>
+            <div id="right-footer">
+                <a class="url" href={{ next_href }}>{{ next_content }} &#8594;</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

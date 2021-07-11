@@ -1,0 +1,5 @@
+digraph {
+	"visit shop" [label="visit shop" color=red shape=oval]
+	"add to cart" [label="add to cart" color=red shape=oval]
+	"visit shop" -> "add to cart" [label="100%" color=red shape=oval]
+}

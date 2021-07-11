@@ -1,0 +1,17 @@
+digraph {
+	"check out" [label="check out" color=red shape=oval]
+	node37 [label=device_os__name color=orange shape=diamond]
+	"check out" -> node37 [label=""]
+	node37 -> "check out" [label="macintosh 84%"]
+	"check out" [label="check out" color=red shape=oval]
+	node37 -> "completed purchase" [label="macintosh 12%"]
+	"completed purchase" [label="completed purchase" color=red shape=oval]
+	node37 -> "view product detail" [label="macintosh 4%"]
+	"view product detail" [label="view product detail" color=red shape=oval]
+	node37 -> "check out" [label="chrome os 100%"]
+	"check out" [label="check out" color=red shape=oval]
+	node37 -> "check out" [label="windows 83%"]
+	"check out" [label="check out" color=red shape=oval]
+	node37 -> "view product detail" [label="windows 16%"]
+	"view product detail" [label="view product detail" color=red shape=oval]
+}

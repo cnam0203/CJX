@@ -1,0 +1,42 @@
+{% extends 'journey/base-dashboard.html' %}
+
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'journey/css/documentation.css' %}">
+    <div class="documentation-container">
+        <div class="documentation-name">Documentation - API Integration</div>
+        <div id="content-container">
+            <p class="header-content">API Integration</p>
+            <p class="main-content">Customer Journey Master enables businesses to integrate their customer touchpoint data collected from websites, e-commerce sites, or mobile sales applications through Restful API.</p>
+            <p class="main-content">Step 1: Create Secret Key</p>
+            <ul>
+                <li class="list-content">Click Database button on the left column</li>
+                <li class="list-content">Click SecretKey button</li>
+                <li class="list-content">Click Add New Item button</li>
+                <li class="list-content">Input a secret key and Save</li>
+            </ul>
+            <p class="main-content">Step 2: Prepare Restful API</p>
+            <ul>
+                <li class="list-content">End Point: http://${domain_website}||${ip_address}/journey/import/add-new-touchpoint</li>
+                <li class="list-content">Method    : 'POST'</li>
+                <li class="list-content">Header    : add field 'Authorization: Bearer ${SECRET_KEY}'</li>
+                <li class="list-content">Parameters: list of fields in Touchpoint Model</li>
+                <li class="list-content">* If not exist one of these parameters ('time', 'channel_type', 'device_browser', 'device_os', 'device_category', 'geo_continent', 'geo_country', 'geo_city'), CJM will detect and fill in</li>
+                <li class="list-content">Example: http://127.0.0.0/journey/import/add-new-touchpoint?customer_id=1&action_type=login&channel_type=website</li>
+            </ul>
+            <p class="main-content">Step 3: Wait for Response</p>
+            <ul>
+                <li class="list-content">A 200 response (OK) indicates success</li>
+                <li class="list-content">A 400 response indicates an error in parameters given</li>
+            </ul>
+        </div>
+        <div id="content-footer">
+            <div id="left-footer">
+                <a class="url" href={{ previous_href }}>&#8592; {{ previous_content }}</a>
+            </div>
+            <div id="right-footer">
+                <a class="url" href={{ next_href }}>{{ next_content }} &#8594;</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

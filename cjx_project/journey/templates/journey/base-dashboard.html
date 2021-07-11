@@ -10,7 +10,7 @@
             </a>
         </div>
         <div class="vertical-div center-header" onclick>
-                Mapping and Analytics
+                Data Platform and Analytics
         </div>
         <div class="right-header">
             <div class="dropdown-btn vertical-div">staff, {{ user.get_username }}</div>
@@ -59,6 +59,8 @@
                         <a href="/graph_model/table/clustered_journey_graph">Clustered process graph</a>
                         <a href="/graph_model/table/journey_cluster_model">Journey cluster model</a>
                         <a href="/graph_model/table/clustered_customer">Clustered Customers</a>
+                        <a href="/graph_model/table/decision_process_graph">Decision Mining Process</a>
+                        <a href="/graph_model/table/decision_action_graph">Decision Mining Action</a>
                     </div>
                 </div>
                 <div class="dropdown-menu-container">
@@ -80,16 +82,17 @@
                     <div class="sub-dropdown-menu" id="analytics-subclass">
                         <a href="/graph_model/analytics/visualize-process-graph" >Visualize journey</a>
                         <a href="/graph_model/analytics/trace-clustering" >Trace clustering</a>
+                        <a href="/graph_model/analytics/decision-mining" >Decision mining</a>
                     </div>
                 </div>
                 <div class="dropdown-menu-container">
-                    <a href="/" class="dropdown-menu-item vertical-div">
+                    <a href="/journey/report" class="dropdown-menu-item vertical-div">
                         <img src="{% static '/journey/images/pie-chart.svg' %}" />
                         <div>Report</div>
                     </a>
                 </div>
                 <div class="dropdown-menu-container">
-                    <a href="/" class="dropdown-menu-item vertical-div">
+                    <a href="/journey/documentation" class="dropdown-menu-item vertical-div">
                         <img src="{% static '/journey/images/copy.svg' %}" />
                         <div>Documentation</div>
                     </a>

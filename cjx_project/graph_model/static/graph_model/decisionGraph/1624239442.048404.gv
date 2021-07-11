@@ -1,0 +1,5 @@
+digraph {
+	"checkout cart" [label="checkout cart" color=red shape=oval]
+	"complete purchased" [label="complete purchased" color=red shape=oval]
+	"checkout cart" -> "complete purchased" [label="100%" color=red shape=oval]
+}

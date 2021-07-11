@@ -1,0 +1,5 @@
+digraph {
+	"remove from cart" [label="remove from cart" color=red shape=oval]
+	"remove from cart" [label="remove from cart" color=red shape=oval]
+	"remove from cart" -> "remove from cart" [label="100%" color=red shape=oval]
+}

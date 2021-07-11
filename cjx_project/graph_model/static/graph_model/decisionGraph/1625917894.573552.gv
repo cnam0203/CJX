@@ -1,0 +1,5 @@
+digraph {
+	"completed purchase" [label="completed purchase" color=red shape=oval]
+	"completed purchase" [label="completed purchase" color=red shape=oval]
+	"completed purchase" -> "completed purchase" [label="100%" color=red shape=oval]
+}

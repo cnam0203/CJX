@@ -27,7 +27,7 @@ class Clustered_Journey_Graph(models.Model):
     link = models.CharField(max_length=150, blank=True, null=True)
 
     def __str__(self):
-        return (str(self.clusterID) + '-' + str(self.clusterNumber) + '-' + (self.clusterName or '') + '-' + self.type)
+        return (str(self.clusterModelID) + '-' + str(self.clusterNumber) + '-' + (self.clusterName or '') + '-' + self.type)
 
 
 class Journey_Process_Graph(models.Model):
@@ -38,6 +38,21 @@ class Journey_Process_Graph(models.Model):
     type = models.CharField(max_length=50, blank=True, null=True)
     link = models.CharField(max_length=150, blank=True, null=True)
 
+
+class Decision_Process_Graph(models.Model):
+    id = models.AutoField(primary_key=True)
+    startDate = models.DateTimeField()
+    endDate = models.DateTimeField()
+    runDate = models.DateTimeField()
+    journeyProcessID = models.IntegerField(blank=True, null=True)
+    processGraphLink = models.CharField(max_length=150, blank=True, null=True)
+    decisionGraphLink = models.CharField(max_length=150, blank=True, null=True)
+
+class Decision_Action_Graph(models.Model):
+    id = models.AutoField(primary_key=True)
+    action = models.CharField(max_length=150, blank=True, null=True)
+    decisionProcessID = models.IntegerField(blank=True, null=True)
+    actionGraphLink = models.CharField(max_length=150, blank=True, null=True)
 
 class Clustered_Customer(models.Model):
     customer_id = models.BigIntegerField(blank=True, null=True)
