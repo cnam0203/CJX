@@ -50,7 +50,7 @@
             newParentDiv.classList.add("chart");
 
             newParentDiv.appendChild(newChildDiv)
-            container.appendChild(newParentDiv);
+            container.appendChild(newChildDiv);
 
             if (chart.type == 1) {
                 Highcharts.chart(containerName, {
@@ -101,14 +101,23 @@
                     dict[category] = new Array(xCategories.length).fill(0);
                 })
 
+                dict['total'] = new Array(xCategories.length).fill(0);
+
                 chart.data.map(row => {
                     xIndex = xCategories.indexOf(row[0])
                     dict[row[2]][xIndex] = row[1]
+                    dict['total'][xIndex] += row[1]
                 })
 
                 for (const category in dict) {
+                    let type = ''
+
+                    if (category == 'total')
+                        type = 'line'
+
                     series.push({
                         name: category,
+                        type: type,
                         data: dict[category]
                     })
                 }
@@ -128,16 +137,6 @@
                         title: {
                             text: 'Total Touchpoint'
                         },
-                        stackLabels: {
-                            enabled: true,
-                            style: {
-                                fontWeight: 'bold',
-                                color: ( // theme
-                                    Highcharts.defaultOptions.title.style &&
-                                    Highcharts.defaultOptions.title.style.color
-                                ) || 'gray'
-                            }
-                        }
                     },
                     tooltip: {
                         headerFormat: '<b>{point.x}</b><br/>',
@@ -145,10 +144,7 @@
                     },
                     plotOptions: {
                         column: {
-                            stacking: 'normal',
-                            dataLabels: {
-                                enabled: true
-                            }
+                            stacking: 'normal'
                         }
                     },
                     series: series
