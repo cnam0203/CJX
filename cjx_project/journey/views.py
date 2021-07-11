@@ -479,7 +479,7 @@ def get_total_user_chart(startDate, endDate):
     total_customer_by_day = list(Touchpoint.objects.filter(time__range=[startDate, endDate]).annotate(date=TruncDate('time')).values('date').annotate(total=Count('customer_id', distinct=True)).order_by('date'))
     report_data = []
 
-    if (total_customer_by_day[0]['total'] != 0):
+    if (len(total_customer_by_day) != 0):
         report_data = [[item['date'].strftime("%d-%m-%Y"), item['total']] for item in total_customer_by_day]
 
     return report_data
@@ -488,7 +488,7 @@ def get_total_touchpoint_chart(startDate, endDate):
     total_touchpoint_by_day = list(Touchpoint.objects.filter(time__range=[startDate, endDate]).annotate(date=TruncDate('time')).values('date').annotate(total=Count('id')).order_by('date'))
     report_data = []
 
-    if (total_touchpoint_by_day[0]['total'] != 0):
+    if (len(total_touchpoint_by_day) != 0):
         report_data = [[item['date'].strftime("%d-%m-%Y"), item['total']] for item in total_touchpoint_by_day]
     return report_data
 
@@ -497,7 +497,7 @@ def get_total_item_chart(startDate, endDate, report):
     total_item_by_date = list(Touchpoint.objects.filter(time__range=[startDate, endDate]).annotate(date=TruncDate('time')).values('date', column_name).annotate(total=Count('id')).order_by('date', column_name))
     report_data = []
 
-    if (total_item_by_date[0]['total'] != 0):
+    if (len(total_item_by_date) != 0):
         report_data = [[item['date'].strftime("%d-%m-%Y"), item['total'], item[column_name]] for item in total_item_by_date]
     return report_data
 
@@ -507,7 +507,7 @@ def get_report_data(report, type):
     report_usage    =   list(Touchpoint.objects.all().values(column_name).annotate(total=Count(column_name)))
     report_data     =   []
 
-    if (report_usage[0][column_name] != 'None' or report_usage[0]['total'] != 0):
+    if (len(report_usage) != 0 and (report_usage[0][column_name] != 'None' or report_usage[0]['total'] != 0)):
         if (type == 1):
             report_data     =   [[item[column_name],(item['total']/total_usage)*100] for item in report_usage]
         else:

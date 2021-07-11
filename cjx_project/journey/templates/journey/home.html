@@ -77,7 +77,6 @@
         var channel_type_data = JSON.parse("{{channel_type_data|escapejs}}");
         var event_data = JSON.parse("{{event_data|escapejs}}");
 
-        if (event_data.length > 0) {
             Highcharts.chart('action-chart', {
                 chart: {
                     plotBackgroundColor: null,
@@ -86,7 +85,7 @@
                     type: 'pie'
                 },
                 title: {
-                    text: 'Browser market shares in January, 2018'
+                    text: ''
                 },
                 tooltip: {
                     pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
@@ -115,9 +114,8 @@
                     enabled: false
                 }
             });
-        }
+        
 
-        if (device_category_data.length > 0) {
             Highcharts.chart('device-chart', {
                 chart: {
                     plotBackgroundColor: null,
@@ -154,7 +152,7 @@
                 },
                 series: [{
                     type: 'pie',
-                    name: 'Browser share',
+                    name: 'Device Category Share',
                     innerSize: '50%',
                     data: device_category_data
                 }],
@@ -162,10 +160,7 @@
                     enabled: false
                 }
             });
-        }
 
-        if (channel_type_data.length > 0) {
-            console.log(channel_type_data)
             Highcharts.chart('channel-chart', {
                 chart: {
                     type: 'column'
@@ -183,7 +178,7 @@
                 },
                 yAxis: {
                     title: {
-                        text: 'Total percent market share'
+                        text: 'Total percent share'
                     }
 
                 },
@@ -218,7 +213,6 @@
                     enabled: false
                 }
             })
-        }
     </script>
     <script>
         AOS.init({duration: 1500,});
