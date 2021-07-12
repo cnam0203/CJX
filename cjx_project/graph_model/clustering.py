@@ -1,7 +1,6 @@
 
 from kmodes.kmodes import KModes
 from sklearn.cluster import KMeans
-from sklearn import preprocessing as sk_preprocessing
 
 
 def kmeans_clustering(X_data, numClusters):

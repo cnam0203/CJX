@@ -14,6 +14,7 @@ from pm4py.visualization.petrinet import visualizer as pn_visualizer
 from pm4py.visualization.process_tree import visualizer as pt_visualizer
 from pm4py.visualization.heuristics_net import visualizer as hn_visualizer
 from pm4py.visualization.dfg import visualizer as dfg_visualization
+from sklearn import preprocessing as sk_preprocessing
 
 import operator
 import math
