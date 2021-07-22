@@ -44,31 +44,35 @@ def create_mapping_file(request):
 
 
 @login_required(login_url="/authentication/login")
-@csrf_exempt
 def upload_mapping_file(request):
     if request.method == "POST":
-        data_source         = request.POST.get('dataSrc')
-        matching_columns    = json.loads(request.POST.get('matchingColumns'))
+        mapping_file_name   = request.POST.get('mappingFileName')
+        mapping_columns     = json.loads(request.POST.get('mappingColumns'))
         files               = request.FILES.getlist('files[]')
         link_url            = ''
 
-        if (len(files) > 0):
+        # If mapping file contains instruction image, save image in static file
+        if (len(files)):
             instructionImg          = files[0]
             filename                = 'journey/instructions/' + str(datetime.now().timestamp()) + ".png"
             (static_path, link_url) = get_static_path(filename, 'journey')
             handle_uploaded_file(instructionImg, static_path)
 
-        new_report = Matching_Report.objects.create(name=data_source, instruction_link=link_url)
+        # Insert into Matching_Report table new row for information of mapping file
+        new_report = Matching_Report.objects.create(name=mapping_file_name, instruction_link=link_url)
         new_report.save()
 
-        for column in matching_columns:
+        # For each mapping columns in mapping file, insert it into Matching_Column table
+        for column in mapping_columns:
             new_matching_column = Matching_Column.objects.create(report=new_report,
                                                                  journey_column=column['journey_column'],
                                                                  report_column=column['report_column'],
                                                                  function=column['function'])
             new_matching_column.save()
 
-        return JsonResponse({"result": "Create Successfully"})
+        return JsonResponse({"status": 200, "result": "Create Successfully"})
+
+    return JsonResponse({"status": 400, "result": "Upload failed"})
 
 
 @login_required(login_url="/authentication/login")
@@ -109,27 +113,28 @@ def import_touchpoint(request):
 
 
 @login_required(login_url="/authentication/login")
-@csrf_exempt
-def upload_touchpoint(request):
+def import_touchpoints(request):
     if request.method == "POST":
         body = json.loads(request.body)
-        touchpoints = body["data"]
+        import_touchpoints = body["data"]
         new_touchpoints = []
 
-        for touchpoint in touchpoints:
+        for touchpoint in import_touchpoints:
+            # Check field in touchpoint valid
             new_touchpoint = create_new_touchpoint(touchpoint)
 
-            if (new_touchpoint):
+            if (new_touchpoint):    # If valid, add new touchpoint in list new touchpoints
                 new_touchpoints.append(new_touchpoint)
-            else:
-                return JsonResponse({"result": "Import failed"})
+            else:                   # If invalid, response import failed
+                return JsonResponse({"status": 400, "result": "Import failed"})
 
         for new_touchpoint in new_touchpoints:
-            new_touchpoint.save()
+            new_touchpoint.save()   # Add new touchpoint in database
 
-        return JsonResponse({"result": "Import Successfully"})
+        return JsonResponse({"status": 200, "result": "Import Successfully"})
 
-    return JsonResponse({"result": "Import failed"})
+    return JsonResponse({"status": 400, "result": "Import failed"})
+
 
 
 @login_required(login_url="/authentication/login")
@@ -161,7 +166,6 @@ def read_instruction(request):
 
 
 @login_required(login_url="/authentication/login")
-@csrf_exempt
 def report(request):
     startDate, endDate  = get_period(request)
     list_report = []
@@ -191,11 +195,13 @@ def report(request):
                             'type': 2
                         })
     
+    print(list_report)
+    
     return render(
                     request, 
                     "journey/report.html",
                     {
-                        "data": dumps(list_report)
+                        "reports": dumps(list_report)
                     }
                 )
 
@@ -407,7 +413,7 @@ def get_create_mapping_file(request):
     fields  = [field.name for field in Touchpoint._meta.get_fields() 
                             if field.name != 'id' and field.name != 'report_time']
     reports = [report.name for report in Matching_Report.objects.all()]
-
+    print('Hello')
     return render(
                     request, 
                     "journey/mapping-file.html", 
@@ -448,16 +454,22 @@ def add_new_touchpoint(req):
         headers = req.headers
         message = ''
 
+        # Check api_access_token
         if (headers['Authorization'].split(' ')[1]):
             api_token = headers['Authorization'].split(' ')[1]
             tokens = list(API_KEY.objects.filter(key=api_token))
 
+            # If access_token is valid
             if (len(tokens) > 0):
-                if (req.body and json.loads(req.body) and json.loads(req.body)['data']):
+                if (req.body):
+                    # Load data in request body
                     data = json.loads(req.body)['data']
+                    # Find device info based on http request
                     data = track_device_info(req, data)
+                    # Find geo network based on http request
                     data = track_geo_info(req, data)
 
+                    # Check touchpoint is valid
                     new_touchpoint = create_new_touchpoint(data)
                     if (new_touchpoint):
                         new_touchpoint.save()

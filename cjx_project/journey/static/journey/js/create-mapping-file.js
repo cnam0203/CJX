@@ -51,8 +51,8 @@ function submitMappingFile(reports, journeyColumns) {
   }
 
   const formData = new FormData();
-  formData.append('dataSrc', datasrc);
-  formData.append('matchingColumns', JSON.stringify(matchingColumns));
+  formData.append('mappingFileName', datasrc);
+  formData.append('mappingColumns', JSON.stringify(matchingColumns));
   formData.append('files[]', instructionImg);
 
   const csrftoken = getCookie('csrftoken');

@@ -24,5 +24,4 @@ def login_page(request):
 
 def logout_page(request):
     logout(request)
-    print('asfas')
     return redirect("/authentication/login")

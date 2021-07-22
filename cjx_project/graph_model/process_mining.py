@@ -16,16 +16,22 @@ from pm4py.objects.conversion.process_tree import converter as pt_converter
 from pm4py.objects.log.util import dataframe_utils
 
 def get_process_discovery(touchpoints, type):
-    df = pd.DataFrame(touchpoints)
-    df["time"] = pd.to_datetime(df['time'], unit='s')
-    df = dataframe_utils.convert_timestamp_columns_in_df(df)
+    # Format list touchpoints 
+    df          = pd.DataFrame(touchpoints)
+
+    # Convert time field from timestamp into second
+    df["time"]  = pd.to_datetime(df['time'], unit='s')
+    df          = dataframe_utils.convert_timestamp_columns_in_df(df)
+
+    # Rename field in touchpoint into valid field
     df.rename(columns={'customer_id': 'case:concept:name',
               'action_type__name': 'concept:name', 'time': 'time:timestamp'}, inplace=True)
-    df = df.sort_values(by=['case:concept:name', 'time:timestamp'])
-    log = log_converter.apply(df)
+    df          = df.sort_values(by=['case:concept:name', 'time:timestamp'])
+    log         = log_converter.apply(df)
 
     gviz = None
 
+    # Get process discovery graph bases on algorithm
     if type == "alpha":
         gviz = alpha_miner_algo(log)
     elif type == "heuristic-heu-net":
@@ -41,6 +47,7 @@ def get_process_discovery(touchpoints, type):
     elif type == "inductive-miner-petri":
         gviz = inductive_miner_petri_net(log)
 
+    # Response a gviz object, which is then rendered into image
     return gviz
 
 

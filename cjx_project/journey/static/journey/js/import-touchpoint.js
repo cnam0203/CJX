@@ -350,7 +350,6 @@ function submitTouchpoint() {
 
     for (data of importData) {
       const validData = {};
-
       // eslint-disable-next-line guard-for-in
       for (key in matchColumns) {
         validData[key] = data[matchColumns[key]];
@@ -369,7 +368,7 @@ function submitTouchpoint() {
   loadingModal.style.display = 'flex';
 
   const csrftoken = getCookie('csrftoken');
-  fetch('/admin/journey/upload-touchpoint', {
+  fetch('/admin/journey/import-touchpoints', {
     method: 'post',
     mode: 'same-origin',
     headers: {

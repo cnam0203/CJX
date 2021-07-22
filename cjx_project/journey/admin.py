@@ -37,12 +37,6 @@ class TouchpointAdmin(admin.ModelAdmin):
         return format_html("<a href='{}'>{}</a>", link, str(obj.customer_id))
 
 
-class Channel_Type_Admin(admin.ModelAdmin):
-    list_display = ("id", "name")
-
-class Action_Type_Admin(admin.ModelAdmin):
-    list_display = ("id", "name")
-
 class Source_Type_Admin(admin.ModelAdmin):
     list_display = ("id", "name")
 
@@ -73,6 +67,12 @@ class Matching_Report_Admin(admin.ModelAdmin):
 class Matching_Column_Admin(admin.ModelAdmin):
     list_display = ("id", "report", "journey_column", "report_column", "function")
     search_fields = ("report__name", "journey_column", "report_column")
+
+class Channel_Type_Admin(admin.ModelAdmin):
+    list_display = ("id", "name")
+
+class Action_Type_Admin(admin.ModelAdmin):
+    list_display = ("id", "name")
 
 admin.site.register(Touchpoint, TouchpointAdmin)
 admin.site.register(Channel_Type, Channel_Type_Admin)

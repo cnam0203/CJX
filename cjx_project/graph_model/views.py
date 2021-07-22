@@ -336,7 +336,7 @@ def get_decision_graph(request):
                     )
 
 @login_required(login_url="/authentication/login")
-def get_cluster_journey(request):
+def get_trace_clustering(request):
     if (request.method == "POST"):
         startDate, endDate  = get_period(request)
         touchpoints         = get_list_touchpoints(startDate, endDate)
@@ -366,12 +366,13 @@ def get_cluster_journey(request):
         X_data                      = preprocess_touchpoint(user_journeys, list_action_types, preprocessMethod)
 
         # Run clustering algorithm and save model
-        model = cluster_touchpoints(X_data, algorithm, numClusters)
-        newClusterID, path = save_cluster_model(
-            startDate=startDate, endDate=endDate, algorithm=algorithm, preprocess=preprocessMethod, numClusters=numClusters, clusterModel=model)
+        model = cluster_journeys(X_data, algorithm, numClusters)
+        newClusterID, model_path = save_cluster_model(
+                            startDate=startDate, endDate=endDate, algorithm=algorithm, 
+                            preprocess=preprocessMethod, numClusters=numClusters, clusterModel=model)
 
         # Find predict cluster for each journey
-        clusters, Y_predict = predict_journey_cluster(algorithm, X_data, path)
+        clusters, Y_predict = predict_journey_cluster(algorithm, X_data, model_path)
 
         list_clustered_journeys = [[] for i in range(0, len(clusters))]
 
@@ -385,8 +386,8 @@ def get_cluster_journey(request):
 
         # Save database
         graphLinks = []
-        for index, clustered_touchpoint in enumerate(list_clustered_journeys):
-            graph, net = get_process_discovery(clustered_touchpoint, miningAlgorithm)
+        for index, clustered_journey in enumerate(list_clustered_journeys):
+            graph, net = get_process_discovery(clustered_journey, miningAlgorithm)
             graphLink = save_cluster_graph(
                 graph, newClusterID, index, miningAlgorithm)
             graphLinks.append(graphLink)
@@ -598,7 +599,7 @@ def create_journey(touchpoints):
     return list_journeys, list_userID
 
 
-def cluster_touchpoints(X_data, algorithm, numClusters):
+def cluster_journeys(X_data, algorithm, numClusters):
     if (algorithm == "k-means"):
         model = kmeans_clustering(X_data, numClusters)
     elif (algorithm == "k-modes"):
@@ -611,7 +612,7 @@ def preprocess_touchpoint(user_journeys, list_action_types, preprocess):
     if (preprocess == "bag-of-activities"):
         preprocessed_touchpoints = preprocess_bag_of_activities(
             user_journeys, list_action_types)
-    if (preprocess == "sequence-vector"):
+    elif (preprocess == "sequence-vector"):
         preprocessed_touchpoints = preprocess_sequence_vector(
             user_journeys, list_action_types)
     return preprocessed_touchpoints
