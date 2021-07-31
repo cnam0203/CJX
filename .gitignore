@@ -134,6 +134,7 @@ dmypy.json
 
 *.png
 *.sav
+*.gv
 
 node_modules/
 .enslintrc.js

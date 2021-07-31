@@ -113,23 +113,23 @@ def import_touchpoint(request):
 
 
 @login_required(login_url="/authentication/login")
-def import_touchpoints(request):
+def import_csv_file(request):
     if request.method == "POST":
         body = json.loads(request.body)
         import_touchpoints = body["data"]
-        new_touchpoints = []
+        valid_touchpoints = []
 
         for touchpoint in import_touchpoints:
             # Check field in touchpoint valid
-            new_touchpoint = create_new_touchpoint(touchpoint)
+            valid_touchpoint = create_valid_touchpoint(touchpoint)
 
-            if (new_touchpoint):    # If valid, add new touchpoint in list new touchpoints
-                new_touchpoints.append(new_touchpoint)
-            else:                   # If invalid, response import failed
+            if (valid_touchpoint):      # If valid, add valid touchpoint in list valid touchpoints
+                valid_touchpoints.append(valid_touchpoint)
+            else:                       # If invalid, response import failed
                 return JsonResponse({"status": 400, "result": "Import failed"})
 
-        for new_touchpoint in new_touchpoints:
-            new_touchpoint.save()   # Add new touchpoint in database
+        for valid_touchpoint in valid_touchpoints:
+            valid_touchpoint.save()   # Add valid touchpoint in database
 
         return JsonResponse({"status": 200, "result": "Import Successfully"})
 
@@ -194,8 +194,6 @@ def report(request):
                             'data'  : total_touchpoint_by_item,
                             'type': 2
                         })
-    
-    print(list_report)
     
     return render(
                     request, 
@@ -413,7 +411,6 @@ def get_create_mapping_file(request):
     fields  = [field.name for field in Touchpoint._meta.get_fields() 
                             if field.name != 'id' and field.name != 'report_time']
     reports = [report.name for report in Matching_Report.objects.all()]
-    print('Hello')
     return render(
                     request, 
                     "journey/mapping-file.html", 
@@ -449,16 +446,14 @@ def review_mapping_file(request, dataSrcName=None):
 
 
 @csrf_exempt
-def add_new_touchpoint(req):
+def import_touchpoint_api(req):
     if (req.method == 'POST'):
         headers = req.headers
         message = ''
-
         # Check api_access_token
-        if (headers['Authorization'].split(' ')[1]):
+        if ('Authorization' in headers):
             api_token = headers['Authorization'].split(' ')[1]
             tokens = list(API_KEY.objects.filter(key=api_token))
-
             # If access_token is valid
             if (len(tokens) > 0):
                 if (req.body):
@@ -470,7 +465,7 @@ def add_new_touchpoint(req):
                     data = track_geo_info(req, data)
 
                     # Check touchpoint is valid
-                    new_touchpoint = create_new_touchpoint(data)
+                    new_touchpoint = create_valid_touchpoint(data)
                     if (new_touchpoint):
                         new_touchpoint.save()
                         return JsonResponse({'status': 200, 'message': 'Add new touchpoint successfully'})
@@ -565,7 +560,7 @@ def track_device_info(request, data):
     return data
 
 
-def create_new_touchpoint(touchpoint):
+def create_valid_touchpoint(touchpoint):
     new_touchpoint = Touchpoint()
     for key in touchpoint:
         value = touchpoint[key]

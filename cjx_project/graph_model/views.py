@@ -363,8 +363,7 @@ def get_trace_clustering(request):
         # Preprocess data
         user_journeys, customer_ids = create_journey(touchpoints)
         list_action_types           = get_unique_values(touchpoints, 'action_type__name')
-        X_data                      = preprocess_touchpoint(user_journeys, list_action_types, preprocessMethod)
-
+        X_data                      = preprocess_journey(user_journeys, list_action_types, preprocessMethod)
         # Run clustering algorithm and save model
         model = cluster_journeys(X_data, algorithm, numClusters)
         newClusterID, model_path = save_cluster_model(
@@ -434,7 +433,7 @@ def get_cluster_user(request, id):
         # Preprocess data
         user_journeys, customer_ids = create_journey(touchpoints)
         list_action_types = get_unique_values(touchpoints, 'action_type__name')
-        X_data = preprocess_touchpoint(user_journeys, list_action_types, preprocess)
+        X_data = preprocess_journey(user_journeys, list_action_types, preprocess)
 
         # Predict cluster for customer journey
         clusters, Y_predict = predict_journey_cluster(algorithm, X_data, clusterModelFile)
@@ -607,15 +606,15 @@ def cluster_journeys(X_data, algorithm, numClusters):
     return model
 
 
-def preprocess_touchpoint(user_journeys, list_action_types, preprocess):
-    preprocessed_touchpoints = np.array([])
-    if (preprocess == "bag-of-activities"):
-        preprocessed_touchpoints = preprocess_bag_of_activities(
+def preprocess_journey(user_journeys, list_action_types, preprocessing_method):
+    preprocessed_journeys = np.array([])
+    if (preprocessing_method == "bag-of-activities"):
+        preprocessed_journeys = preprocess_bag_of_activities(
             user_journeys, list_action_types)
-    elif (preprocess == "sequence-vector"):
-        preprocessed_touchpoints = preprocess_sequence_vector(
+    elif (preprocessing_method == "sequence-vector"):
+        preprocessed_journeys = preprocess_sequence_vector(
             user_journeys, list_action_types)
-    return preprocessed_touchpoints
+    return preprocessed_journeys
 
 
 def preprocess_bag_of_activities(user_journeys, list_action_types):
@@ -696,6 +695,8 @@ def save_graph_file(type, gviz, path):
         dfg_visualization.save(gviz, path)
     elif type == "dfg-discovery-active-time":
         dfg_visualization.save(gviz, path)
+    elif type == "dfg-discovery-pet-net":
+        pt_visualizer.save(gviz, path)
     elif type == "inductive-miner-tree":
         pt_visualizer.save(gviz, path)
     elif type == "inductive-miner-petri":

@@ -24,11 +24,11 @@ mining_algorithms = [
         },
         {   
             "value" : "dfg-discovery-frequency", 
-            "name"  : "DFG-Discovery with Frequency"
+            "name"  : "DFG-Discovery with DFG"
         },
         {   
-            "value" : "dfg-discovery-active-time", 
-            "name"  : "DFG-Discovery with Active time"
+            "value" : "dfg-discovery-pet-net", 
+            "name"  : "DFG-Discovery with Petri Net"
         },
         {   "value" : "inductive-miner-tree", 
             "name"  : "Inductive Miner with Tree Graph"

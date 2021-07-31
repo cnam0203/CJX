@@ -151,31 +151,29 @@ function generateTableHeadSelectors() {
     th.style.border = '1px solid #000000';
     row.appendChild(th);
 
-    if (i !== 0) {
-      const select = document.createElement('select');
-      select.setAttribute('name', headers[i]);
-      select.setAttribute('id', headers[i]);
-      select.addEventListener('change', matchColumn);
+    const select = document.createElement('select');
+    select.setAttribute('name', headers[i]);
+    select.setAttribute('id', headers[i]);
+    select.addEventListener('change', matchColumn);
 
-      const nullOptionElement = document.createElement('option');
-      const nullOptionText = document.createTextNode('None');
+    const nullOptionElement = document.createElement('option');
+    const nullOptionText = document.createTextNode('None');
 
-      nullOptionElement.setAttribute('value', 'None');
-      nullOptionElement.appendChild(nullOptionText);
-      select.appendChild(nullOptionElement);
+    nullOptionElement.setAttribute('value', 'None');
+    nullOptionElement.appendChild(nullOptionText);
+    select.appendChild(nullOptionElement);
 
-      // eslint-disable-next-line guard-for-in
-      for (const option in touchpointFields) {
-        const optionElement = document.createElement('option');
-        const optionText = document.createTextNode(option);
+    // eslint-disable-next-line guard-for-in
+    for (const option in touchpointFields) {
+      const optionElement = document.createElement('option');
+      const optionText = document.createTextNode(option);
 
-        optionElement.setAttribute('value', option);
-        optionElement.appendChild(optionText);
-        select.appendChild(optionElement);
-      }
-
-      th.appendChild(select);
+      optionElement.setAttribute('value', option);
+      optionElement.appendChild(optionText);
+      select.appendChild(optionElement);
     }
+
+    th.appendChild(select);
   }
 }
 
@@ -368,7 +366,7 @@ function submitTouchpoint() {
   loadingModal.style.display = 'flex';
 
   const csrftoken = getCookie('csrftoken');
-  fetch('/admin/journey/import-touchpoints', {
+  fetch('/admin/journey/import-csv-file', {
     method: 'post',
     mode: 'same-origin',
     headers: {
