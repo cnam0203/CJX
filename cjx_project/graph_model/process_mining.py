@@ -49,22 +49,19 @@ def get_process_discovery(touchpoints, type):
         gviz = inductive_miner_petri_net(log)
     return gviz
 
-def find_fitness(log, net, im, fm):
+def find_fitness(type, log, net, im, fm):
     fitness1 = replay_fitness_evaluator.apply(log, net, im, fm, variant=replay_fitness_evaluator.Variants.TOKEN_BASED)
-    fitness2 = replay_fitness_evaluator.apply(log, net, im, fm, variant=replay_fitness_evaluator.Variants.ALIGNMENT_BASED)
     simp = simplicity_evaluator.apply(net)
-    print(fitness1)
-    print(fitness2)
-    print(simp)
-
-
+    file = open("/Users/lap14458/Downloads/csv/evaluate.csv", "a")
+    file.write(str(len(log)) + "," + type + "," + str(fitness1['perc_fit_traces']) + ',' + str(simp) + '\n')
+    file.close()
 
 
 def alpha_miner_algo(log):
     # alpha miner
     net, initial_marking, final_marking = alpha_miner.apply(log)
+    find_fitness('alpha', log, net, initial_marking, final_marking)
     gviz = pn_visualizer.apply(net, initial_marking, final_marking)
-    # find_fitness(log, net, initial_marking, final_marking)
     return gviz, None
 
 
@@ -77,7 +74,7 @@ def heuristic_miner_heu_net(log):
 def heuristic_miner_petri_net(log):
     # heuristic miner
     net, initial_marking, final_marking = heuristics_miner.apply(log)
-    # find_fitness(log, net, initial_marking, final_marking)
+    find_fitness('heu', log, net, initial_marking, final_marking)
     gviz = pn_visualizer.apply(net, initial_marking, final_marking)
     return gviz, None
 
@@ -100,7 +97,7 @@ def dfg_discovery_frequency(log):
 def dfg_miner_petri(log):
     dfg = dfg_discovery.apply(log, variant=dfg_discovery.Variants.PERFORMANCE)
     net, im, fm = dfg_mining.apply(dfg)
-    # find_fitness(log, net, im, fm)
+    find_fitness('dfg', log, net, im, fm)
     gviz = pn_visualizer.apply(net, im, fm) 
     return gviz, None
 
@@ -116,7 +113,7 @@ def inductive_miner_petri_net(log):
     tree = inductive_miner.apply_tree(log)
     # convert the process tree to a petri net
     net, initial_marking, final_marking = pt_converter.apply(tree)
-    # find_fitness(log, net, initial_marking, final_marking)
+    find_fitness('induct', log, net, initial_marking, final_marking)
     parameters = {
         pn_visualizer.Variants.FREQUENCY.value.Parameters.FORMAT: "png"}
     gviz = pn_visualizer.apply(net, initial_marking, final_marking,

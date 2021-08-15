@@ -11,11 +11,18 @@ from .models import Action_Type
 from .models import Journey_Customer
 from .models import Matching_Report
 from .models import Matching_Column
+from .models import Data_Source
+from .models import Import_File_Log
 
 class Touchpoint_Form(forms.ModelForm):
     class Meta:
         model = Touchpoint
         fields = '__all__'
+
+class Data_Source_Form(forms.ModelForm):
+    class Meta:
+        model = Data_Source
+        fields = ['name']
 
 class Channel_Type_Form(forms.ModelForm):
     class Meta:
@@ -70,4 +77,9 @@ class Interact_Item_Type_Form(forms.ModelForm):
 class Experience_Emotion_Form(forms.ModelForm):
     class Meta:
         model = Experience_Emotion
+        fields = '__all__'
+
+class Import_File_Log_Form(forms.ModelForm):
+    class Meta:
+        model = Import_File_Log
         fields = '__all__'

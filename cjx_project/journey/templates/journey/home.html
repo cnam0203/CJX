@@ -20,7 +20,7 @@
                         <div>Action</div>
                         <div>Channel</div>
                         <div>Device</div>
-                        <div>Experience</div>
+                        <div>DataSource</div>
                     </div>
                     {% for activity in activities %}
                         <div class="table-row">
@@ -41,7 +41,7 @@
                                     {{ activity.device_category__name }}
                                 </div>
                             </div>
-                            <div class="table-column" >{{ activity.experience }}</div>
+                            <div class="table-column" >{{ activity.data_source__name }}</div>
                         </div>
                     {% endfor %}
                 </div>
@@ -52,8 +52,8 @@
                     <p style='font-size: 25px; font-weight: 400; margin: 15px 0px'>Total customers</p>
                 </div>
                 <div class="number-user-container">
-                    <p style='color: #F06969; font-size: 30px; font-weight: 400; margin: 15px 0px'>{{ new_customer }}</p>
-                    <p style='font-size: 25px; font-weight: 400; margin: 15px 0px'>New daily customers</p>
+                    <p style='color: #F06969; font-size: 30px; font-weight: 400; margin: 15px 0px'>{{ total_touchpoint }}</p>
+                    <p style='font-size: 25px; font-weight: 400; margin: 15px 0px'>Total touchpoints</p>
                 </div>
             </div>
         </div>

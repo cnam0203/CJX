@@ -9,6 +9,7 @@ let touchpointFields = {};
 
 const table = document.getElementById('tbl-csv-data');
 const mappingTypeDiv = document.getElementById('select-mapping-type');
+const dataSourceTypeDiv = document.getElementById('select-data-source');
 const submitBtn = document.getElementById('submit-file');
 
 // eslint-disable-next-line no-unused-vars
@@ -22,6 +23,7 @@ function importFile(allFields, allMatchedColumns) {
 
     importContainer.className += ' border-container';
     mappingTypeDiv.style.display = 'block';
+    dataSourceTypeDiv.style.display = 'block';
     submitBtn.style.display = 'inline-block';
 
     touchpointFields = allFields;
@@ -94,6 +96,7 @@ function refreshUpload() {
   table.innerHTML = '';
   submitBtn.style.display = 'none';
   mappingTypeDiv.style.display = 'none';
+  dataSourceTypeDiv.style.display = 'none';
 }
 
 function generateJSONData(results) {
@@ -343,9 +346,9 @@ function mapFile(selectObj) {
 
 // eslint-disable-next-line no-unused-vars
 function submitTouchpoint() {
+  const dataSource = document.getElementById('dataSource').value;
   if (Object.keys(matchColumns).length != 0) {
     sendData = [];
-
     for (data of importData) {
       const validData = {};
       // eslint-disable-next-line guard-for-in
@@ -362,6 +365,11 @@ function submitTouchpoint() {
     return;
   }
 
+  if (dataSource == '') {
+    alert('Choose a data source');
+    return;
+  }
+
   const loadingModal = document.getElementById('loading-modal');
   loadingModal.style.display = 'flex';
 
@@ -374,9 +382,10 @@ function submitTouchpoint() {
       'Content-type': 'application/json',
       'X-CSRFToken': csrftoken,
     },
-    body: JSON.stringify({data: sendData}),
+    body: JSON.stringify({data: sendData, dataSource: dataSource}),
   })
       .then(function(response) {
+        console.log(new Date());
         return response.json();
       })
       .then(function(data) {

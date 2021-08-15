@@ -60,8 +60,30 @@ class Journey_Customer(models.Model):
     customerID  = models.BigIntegerField(blank=False, null=True, unique=True)
     register_date = models.DateTimeField(blank=False, default=now)
 
+class Data_Source(models.Model):
+    name = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    created_date = models.DateTimeField(default=now)
+    last_update = models.DateTimeField(blank=False, auto_now=True)
+    staff_create = models.CharField(max_length=50, blank=True, null=True)
+    staff_update = models.CharField(max_length=50, blank=True, null=True)
+    staff_id = models.IntegerField(blank=True, null=True)
+    is_public = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.name}"
+
+class Import_File_Log(models.Model):
+    import_date = models.DateTimeField(default=now)
+    number_rows = models.BigIntegerField(blank=False, null=True)
+    staff = models.CharField(max_length=50, blank=True, null=True)
+    staff_id = models.CharField(max_length=50, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.import_date}"
+
 class Touchpoint(models.Model):
     customer_id            = models.BigIntegerField(blank=False, null=True)
+    data_source            = models.ForeignKey(Data_Source, blank=True, null=True, on_delete=models.CASCADE)
     action_type            = models.ForeignKey(Action_Type, blank=False, null=True, on_delete=models.SET_NULL)
     time                   = models.DateTimeField(blank=False, null=True)
     channel_type           = models.ForeignKey(Channel_Type, blank=True, null=True, on_delete=models.SET_NULL)
@@ -86,25 +108,24 @@ class Touchpoint(models.Model):
     interact_item_content  = models.CharField(max_length=500, blank=True, null=True)
     experience_score       = models.FloatField(blank=True, null=True)
     experience_emotion     = models.ForeignKey(Experience_Emotion, blank=True, null=True, on_delete=models.SET_NULL)
+    import_log             = models.ForeignKey(Import_File_Log, blank=True, null=True, on_delete=models.CASCADE)
     record_time            = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.customer_id}, {self.time}, {self.action_type}, {self.channel_type}, {self.device_category}, {self.traffic_source_name}, {self.experience_emotion}"
+        return f"{self.data_source}, {self.customer_id}, {self.time}, {self.action_type}, {self.channel_type}, {self.device_category}, {self.traffic_source_name}, {self.experience_emotion}"
     
     def save(self, *args, **kwargs):
         #figure out warranty end date
         if Journey_Customer.objects.filter(customerID=self.customer_id).exists() == False:
             Journey_Customer.objects.create(customerID=self.customer_id, register_date=self.time)
-        # else:
-        #     journey_customer = Journey_Customer.objects.get(customerID=self.customer_id)
-        #     if (journey_customer.register_date > self.time):
-        #         journey_customer.register_date = self.time
-        #         journey_customer.save()
         super(Touchpoint, self).save()
+
 
 
 class Matching_Report(models.Model):
     name = models.CharField(max_length=50, blank=False, null=True, unique=True)
+    staff = models.CharField(max_length=150, blank=True, null=True)
+    staff_id = models.IntegerField(blank=True, null=True)
     instruction_link = models.CharField(max_length=150, blank=True, null=True)
 
     def __str__(self):
@@ -112,7 +133,7 @@ class Matching_Report(models.Model):
 
 class Matching_Column(models.Model):
     functions = [(function, function) for function in ['lower', 'upper', 'datetime', 'string', 'int', 'float']]
-    report = models.ForeignKey(Matching_Report, blank=False, null=True, on_delete=models.SET_NULL)
+    report = models.ForeignKey(Matching_Report, blank=False, null=True, on_delete=models.CASCADE)
     journey_column = models.CharField(max_length=50, blank=False, null=True)
     report_column = models.CharField(max_length=50, blank=True, null=True)
     function = models.CharField(max_length=50, blank=True, null=True, choices=functions)

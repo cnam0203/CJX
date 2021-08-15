@@ -20,7 +20,7 @@ class Clustered_Customer_Form(forms.ModelForm):
 class Clustered_Journey_Graph_Form(forms.ModelForm):
     class Meta:
         model = Clustered_Journey_Graph
-        fields = '__all__'
+        fields = ['clusterName']
 
 class Decision_Process_Graph_Form(forms.ModelForm):
     class Meta:

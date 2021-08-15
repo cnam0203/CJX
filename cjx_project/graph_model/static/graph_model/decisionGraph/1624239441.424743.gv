@@ -1,5 +1,0 @@
-digraph {
-	"view cart" [label="view cart" color=red shape=oval]
-	"checkout cart" [label="checkout cart" color=red shape=oval]
-	"view cart" -> "checkout cart" [label="100%" color=red shape=oval]
-}

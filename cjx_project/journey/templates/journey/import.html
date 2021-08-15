@@ -18,13 +18,22 @@
                         onchange="importFile({{ allFields }}, {{ matchedColumns }});"/>
             </div>
             <div id="select-mapping-type" style="display: none" class="mapping-container">
-                <label class="mapping-type">Choose mapping type: </label>
+                <label class="mapping-type">Choose matching file: </label>
                 <select id='report' name='report' onchange='mapFile(this)' class="mapping-select">
-                    <option value='' class="mapping-choice">Select data source</option>
+                    <option value='' class="mapping-choice">Ex: google-analytics</option>
                     {% for report in matchingReports%}
                         <option value= {{ report.name }} class="mapping-choice">{{ report.name }}</option>
                     {% endfor %}
-                    <option value='manipulate'>Manipulate</option>
+                    <option value='manipulate'>Manually matching</option>
+                </select>
+            </div>
+            <div id="select-data-source" style="display: none" class="mapping-container">
+                <label class="mapping-type">Choose data source: </label>
+                <select id='dataSource' name="dataSource" class="mapping-select">
+                    <option value='' class="mapping-choice"></option>
+                    {% for source in dataSources%}
+                        <option value= {{ source.id }} class="mapping-choice">{{ source.name }}</option>
+                    {% endfor %}
                 </select>
             </div>
             <div>

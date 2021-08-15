@@ -19,6 +19,15 @@
                 <div class="configure-txt overflow-txt">Configuration</div>
                 <div class="configure-container">
                     <div class="select-container">
+                        <label class="select-label">Data Source</label>
+                        <select id="mining-algorithm" name="data-source" class="select-input" form="clusterForm">
+                            <option value= {{ 'all' }}>All</option>
+                            {% for source in data_sources%}
+                                <option value= {{ source.id }}>{{ source.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="select-container">
                         <label class="select-label">Date From</label>
                         <input type="date" name="startDate" class="select-input"/>
                     </div>

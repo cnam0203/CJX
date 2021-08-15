@@ -15,7 +15,7 @@
         <div class="right-header">
             <div class="dropdown-btn vertical-div">staff, {{ user.get_username }}</div>
             <div class="dropdown-content">
-                <div class="dropdown-li"><a href="#" class="border-bottom vertical-div">Profile</a></div>
+                <div class="dropdown-li"><a href="/journey/change-password" class="border-bottom vertical-div">Change Password</a></div>
                 <div class="dropdown-li"><a href="/authentication/logout" class="vertical-div">Log Out</a></div>
             </div>
         </div>
@@ -41,12 +41,12 @@
                         <a href="/journey/table/device_category">Device category</a>
                         <a href="/journey/table/device_os">Device os</a>
                         <a href="/journey/table/experience_emotion">Experience emotion</a>
-                        <a href="/journey/table/interact_item_type">Interact_Item_Type</a>
+                        <a href="/journey/table/interact_item_type">Interact item type</a>
                         <a href="/journey/table/journey_customer">Journey customer</a>
-                        <a href="/journey/table/matching_column">Mapping file</a>
-                        <a href="/journey/table/matching_report">Mapping data source</a>
                         <a href="/journey/table/traffic_source_type">Traffic source type</a>
                         <a href="/journey/table/touchpoint">Touchpoint</a>
+                        <a href="/journey/table/data_source">Data source</a>
+                        <a href="/journey/table/import_file_log">Import file log</a>
                     </div>
                 </div>
                 <div class="dropdown-menu-container">
@@ -56,10 +56,10 @@
                     </div>
                     <div class="sub-dropdown-menu" id="discovery-subclass">
                         <a href="/graph_model/table/journey_process_graph">Process graph</a>
+                        <a href="/graph_model/table/journey_cluster_model">Journey cluster model</a>
                         <a href="/graph_model/table/clustered_journey_graph">Clustered process graph</a>
                         <a href="/graph_model/table/decision_process_graph">Decision process graph</a>
                         <a href="/graph_model/table/decision_action_graph">Action process graph</a>
-                        <a href="/graph_model/table/journey_cluster_model">Journey cluster model</a>
                         <a href="/graph_model/table/clustered_customer">Clustered customers</a>
                     </div>
                 </div>
@@ -69,8 +69,8 @@
                         <div>Import</div>
                     </div>
                     <div class="sub-dropdown-menu" id="import-subclass">
-                        <a href="/journey/import/create-mapping-file" >Create mapping file</a>
-                        <a href="/journey/import/review-mapping-file" >Review mapping file</a>
+                        <a href="/journey/import/create-mapping-file" >Create matching file</a>
+                        <a href="/journey/import/review-mapping-file" >Review matching file</a>
                         <a href="/journey/import/upload-file" >Import CSV file</a>
                     </div>
                 </div>

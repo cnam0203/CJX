@@ -14,5 +14,6 @@ urlpatterns = [
     path('analytics/decision-mining', views.decision_mining),
     path('analytics/cluster-customer/<int:id>', views.cluster_customer),
     path('table/<tablename>', views.get_list_data),
-    path('form/update/<tablename>/<id>', views.update_form_data)
+    path('form/update/<tablename>/<id>', views.update_form_data),
+    path('form/delete/<tablename>/<id>', views.delete_form_data)
 ]

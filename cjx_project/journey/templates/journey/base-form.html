@@ -6,7 +6,7 @@
     <div class="form-container">
         <div class="form-name">{{ formName }}</div>
         <img src="{% static '/journey/images/tap.svg' %}" id="tap-icon"/>
-        <form action="" method="POST" class="form">
+        <div class="form">
             {% csrf_token %}
             {% for field in form %}
                 <div class="field">
@@ -16,9 +16,6 @@
                     {{ field }}
                 </div>
             {% endfor %}
-            <div class="btn">
-                <button type="sumbit" class="form-btn">Save</button>
-            </div>
-        </form>
+        </div>
     </div>
 {% endblock %}

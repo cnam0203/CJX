@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from django.apps import apps
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+
 
 from .models import Journey_Process_Graph, Clustered_Journey_Graph, Clustered_Customer, Journey_Cluster_Model, Decision_Process_Graph, Decision_Action_Graph
 from .decision_mining import build_tree, print_tree
@@ -25,7 +27,7 @@ import joblib
 
 from datetime import datetime
 from graphviz import Digraph
-from journey.models import Touchpoint
+from journey.models import Touchpoint, Data_Source
 from utils.copy_object import copy_object
 from utils.path_helper import get_static_path
 # Create your views here.
@@ -33,10 +35,13 @@ from utils.path_helper import get_static_path
 
 @login_required(login_url="/authentication/login")
 def visualize_process_graph(request):
+    data_sources_set     =   Data_Source.objects.filter(staff_id=request.user.id) | Data_Source.objects.filter(is_public=True)
+    data_sources = list(data_sources_set.values('name', 'id'))
     return render(
                     request, 
                     "graph_model/visualize-process-graph.html", 
                     {
+                        "data_sources": data_sources,
                         "mining_algorithms": mining_algorithms
                     }
                 )
@@ -44,10 +49,13 @@ def visualize_process_graph(request):
 
 @login_required(login_url="/authentication/login")
 def trace_clustering(request):
+    data_sources_set     =   Data_Source.objects.filter(staff_id=request.user.id) | Data_Source.objects.filter(is_public=True)
+    data_sources = list(data_sources_set.values('name', 'id'))
     return render(
                     request, 
                     "graph_model/trace-clustering.html", 
                     {
+                        "data_sources": data_sources,
                         "preprocessing_methods" : preprocessing_methods,
                         "clustering_algorithms" : clustering_algorithms,
                         "mining_algorithms"     : mining_algorithms
@@ -57,27 +65,37 @@ def trace_clustering(request):
 
 @login_required(login_url="/authentication/login")
 def decision_mining(request):
+    data_sources_set     =   Data_Source.objects.filter(staff_id=request.user.id) | Data_Source.objects.filter(is_public=True)
+    data_sources = list(data_sources_set.values('name', 'id'))
     return render(
                     request, 
-                    "graph_model/decision-mining.html"
+                    "graph_model/decision-mining.html",
+                    {
+                        "data_sources": data_sources
+                    }
                 )
 
 
 @login_required(login_url="/authentication/login")
 def get_list_data(request, tablename):
     Model       = apps.get_model(app_label="graph_model", model_name=tablename)
-    data        = list(Model.objects.all().values())
+    data        = list(Model.objects.filter(staff_id=request.user.id).values())
     headers     = []
     new_data    = []
 
     if (tablename == "journey_process_graph"):
-        headers = ['id', 'startDate', 'endDate', 'runDate', 'miningAlgorithm', 'processGraph']
+        headers = ['id', 'runDate', 'data_source', 'miningAlgorithm', 'processGraph', 'delete']
 
         for obj in data:
             obj['miningAlgorithm']          = obj["type"]
             obj['processGraph']             = {}
             obj['processGraph']['link']     = obj["link"]
             obj['processGraph']['value']    = 'view'
+
+
+            obj['delete']             = {}
+            obj['delete']['link']     = '/graph_model/form/delete/journey_process_graph/' + str(obj["id"])
+            obj['delete']['value']    = 'delete'
 
             new_obj = copy_object(obj, headers)
             new_data.append(new_obj)
@@ -99,12 +117,16 @@ def get_list_data(request, tablename):
             new_data.append(new_obj)
 
     elif (tablename == "journey_cluster_model"):
-        headers = ("id", "runDate", "algorithm", "preprocessing", "numberClusters", "accuracy", "clusterCustomer")
+        headers = ("id", "runDate", 'data_source', "algorithm", "preprocessing", "numberClusters", "clusterCustomer", "delete")
 
         for obj in data:
             obj["clusterCustomer"]          = {}
             obj["clusterCustomer"]['link']  = "/graph_model/analytics/cluster-customer/" + str(obj["id"])
             obj["clusterCustomer"]['value'] = 'Cluster now'
+
+            obj['delete']             = {}
+            obj['delete']['link']     = '/graph_model/form/delete/journey_cluster_model/' + str(obj["id"])
+            obj['delete']['value']    = 'delete'
 
             new_obj = copy_object(obj, headers)
             new_data.append(new_obj)
@@ -129,7 +151,7 @@ def get_list_data(request, tablename):
             new_data.append(new_obj)
 
     elif (tablename == "decision_process_graph"):
-        headers = ["id", "startDate", "endDate", "runDate", "journeyProcess", "processGraph", "decisionGraph"]
+        headers = ["id", "runDate", 'data_source', "journeyProcess", "processGraph", "decisionGraph", "delete"]
 
         for obj in data:
             obj["journeyProcess"]           = {}
@@ -143,6 +165,10 @@ def get_list_data(request, tablename):
             obj["decisionGraph"]            = {}
             obj["decisionGraph"]['link']    = obj["decisionGraphLink"]
             obj["decisionGraph"]['value']   = 'view'
+
+            obj['delete']             = {}
+            obj['delete']['link']     = '/graph_model/form/delete/decision_process_graph/' + str(obj["id"])
+            obj['delete']['value']    = 'delete'
 
             new_obj = copy_object(obj, headers)
             new_data.append(new_obj)
@@ -162,11 +188,13 @@ def get_list_data(request, tablename):
             new_obj = copy_object(obj, headers)
             new_data.append(new_obj)
 
+    list_data = new_data[::-1]
+
     return render(
                     request, 
                     "graph_model/base-table.html", 
                     {
-                        'data': new_data, 
+                        'data': list_data, 
                         'tableName': tablename, 
                         'headers': headers
                     }
@@ -195,13 +223,26 @@ def update_form_data(request, tablename, id=None):
                     }
                 )
 
+@login_required(login_url="/authentication/login")
+def delete_form_data(request, tablename, id=None):
+    Model       = apps.get_model(app_label="graph_model", model_name=tablename)
+    FormModel   = formData[tablename]
+
+    obj         = get_object_or_404(Model, pk=id)
+    obj.delete()
+
+    return redirect("/graph_model/table/" + tablename)
+
 
 @login_required(login_url="/authentication/login")
 def cluster_customer(request, id):
+    data_sources_set     =   Data_Source.objects.filter(staff_id=request.user.id) | Data_Source.objects.filter(is_public=True)
+    data_sources = list(data_sources_set.values('name', 'id'))
     return render(
                     request, 
                     "graph_model/cluster-customer.html", 
                     {
+                        "data_sources": data_sources,
                         "clusterID": id, 
                         "clusterSuccess": False
                     }
@@ -229,6 +270,8 @@ def get_visualize_graph_page(request):
 
 @login_required(login_url="/authentication/login")
 def get_cluster_user_page(request, id):
+    data_sources_set     =   Data_Source.objects.filter(staff_id=request.user.id) | Data_Source.objects.filter(is_public=True)
+    data_sources = list(data_sources_set.values('name', 'id'))
     return render(
                     request, 
                     "graph_model/cluster-user.html", 
@@ -237,12 +280,21 @@ def get_cluster_user_page(request, id):
                         "clusterSuccess": False
                     })
 
+def get_data_source(id):
+    if (id == 'all'):
+        return 'All'
+    else:
+        return Data_Source.objects.get(id=id).name
 
-@login_required(login_url="/authentication/login")
+@csrf_exempt
 def get_customer_process_discovery(request):
     if (request.method == "POST"):
         startDate, endDate  = get_period(request)
-        touchpoints         = get_list_touchpoints(startDate, endDate)
+        data_sources_set     =   Data_Source.objects.filter(staff_id=request.user.id) | Data_Source.objects.filter(is_public=True)
+        data_sources = list(data_sources_set.values('name', 'id'))
+        data_source = request.POST['data-source']
+        data_source_name = get_data_source(data_source)
+        touchpoints         = get_list_touchpoints(startDate, endDate, data_source, request.user.id)
 
         # Check whether data exists in time range
         if (len(touchpoints) == 0):
@@ -250,20 +302,27 @@ def get_customer_process_discovery(request):
                             request, 
                             "graph_model/visualize-process-graph.html", 
                             {
-                                "result": "No available touchpoints"
+                                "result": "No available touchpoints",
+                                "data_sources": list(Data_Source.objects.values('id', 'name')),
+                                "mining_algorithms" : mining_algorithms
                             }
                         )
 
-        # Get customer process discovry
-        mining_algorithm    = request.POST["mining-algorithm"]
+        # Get customer process discovery
+        mining_algorithm = request.POST["mining-algorithm"]
+        # mining_algorithm    = request.POST["mining-algorithm"]
+        file = open("/Users/lap14458/Downloads/csv/evaluate.csv", "a")
+        file.write(str(startDate) + "," + str(endDate) + ',' + str(len(touchpoints)) + ',')
+        file.close()
         graph, net          = get_process_discovery(touchpoints, mining_algorithm)
-        graphLink, processGraphID, processGraphLink = save_process_graph(graph, startDate, endDate, mining_algorithm)
+        graphLink, processGraphID, processGraphLink = save_process_graph(request.user.username, request.user.id, data_source_name, graph, startDate, endDate, mining_algorithm)
 
         return render(
                         request, 
                         "graph_model/visualize-process-graph.html", 
                         {
                             "imgSrc"            : graphLink, 
+                            "data_sources": data_sources,
                             "mining_algorithms" : mining_algorithms
                         }
                     )
@@ -273,7 +332,11 @@ def get_customer_process_discovery(request):
 def get_decision_graph(request):
     if (request.method == "POST"):
         startDate, endDate  = get_period(request)
-        touchpoints         = get_list_touchpoints(startDate, endDate)
+        data_sources_set     =   Data_Source.objects.filter(staff_id=request.user.id) | Data_Source.objects.filter(is_public=True)
+        data_sources = list(data_sources_set.values('name', 'id'))
+        data_source = request.POST['data-source']
+        data_source_name = get_data_source(data_source)
+        touchpoints         = get_list_touchpoints(startDate, endDate, data_source, request.user.id)
         touchpoints.sort(key=lambda touchpoint: touchpoint['time'])
 
         # Check whether data exists in time range
@@ -282,20 +345,21 @@ def get_decision_graph(request):
                             request, 
                             "graph_model/decision-mining.html", 
                             {
-                                "result": "No available touchpoints"
+                                "result": "No available touchpoints",
+                                "data_sources": data_sources,
                             }
                         )
         
         # Get customer process discovery by using heuristic mining
         mining_algorithm    = "heuristic-heu-net"
         graph, net          = get_process_discovery(touchpoints, mining_algorithm)
-        processGraph, processGraphID, processGraphLink = save_process_graph(graph, startDate, endDate, mining_algorithm)
+        processGraph, processGraphID, processGraphLink = save_process_graph(request.user.username, request.user.id, data_source_name, graph, startDate, endDate, mining_algorithm)
 
         # Convert a heuristic net into a array
         net_arr             = convert_net_to_arr(net)
 
         # Prepare data for decision tree
-        list_attributes     = ['device_category__name', 'device_os__name', 'device_browser__name', 'action_type__name']
+        list_attributes     = ['channel_type__name','device_category__name', 'device_os__name', 'device_browser__name', 'action_type__name']
         X_data              = get_decison_tree_input_data(touchpoints, net_arr, list_attributes)
 
         big_tree_view = Digraph(format='png')
@@ -319,10 +383,10 @@ def get_decision_graph(request):
 
         # Save graph into database
         graphLinks = []
-        decisionGraph, decisionProcessID = save_decision_graph(big_tree_view, startDate, endDate, processGraphID, processGraphLink)
+        decisionGraph, decisionProcessID = save_decision_graph(request.user.username, request.user.id, data_source_name, big_tree_view, startDate, endDate, processGraphID, processGraphLink)
 
         for tree in list_trees:
-            graphLink = save_action_graph(tree['tree_view'], tree['name'], decisionProcessID)
+            graphLink = save_action_graph(request.user.username, request.user.id, tree['tree_view'], tree['name'], decisionProcessID)
             graphLinks.append(graphLink)
 
         return render(
@@ -331,7 +395,8 @@ def get_decision_graph(request):
                         {
                             "processGraph": processGraph, 
                             "decisionGraph": decisionGraph, 
-                            "graphLinks": graphLinks
+                            "graphLinks": graphLinks,
+                            "data_sources": data_sources,
                         }
                     )
 
@@ -339,7 +404,11 @@ def get_decision_graph(request):
 def get_trace_clustering(request):
     if (request.method == "POST"):
         startDate, endDate  = get_period(request)
-        touchpoints         = get_list_touchpoints(startDate, endDate)
+        data_sources_set     =   Data_Source.objects.filter(staff_id=request.user.id) | Data_Source.objects.filter(is_public=True)
+        data_sources = list(data_sources_set.values('name', 'id'))
+        data_source = request.POST['data-source']
+        data_source_name = get_data_source(data_source)
+        touchpoints         = get_list_touchpoints(startDate, endDate, data_source, request.user.id)
 
         # Check whether data exists in time range
         if (len(touchpoints) == 0):
@@ -350,7 +419,8 @@ def get_trace_clustering(request):
                                 "result": "No available touchpoints",
                                 "preprocessing_methods": preprocessing_methods,
                                 "clustering_algorithms": clustering_algorithms,
-                                "mining_algorithms": mining_algorithms
+                                "mining_algorithms": mining_algorithms,
+                                "data_sources": data_sources,
                             }
                         )
 
@@ -366,7 +436,7 @@ def get_trace_clustering(request):
         X_data                      = preprocess_journey(user_journeys, list_action_types, preprocessMethod)
         # Run clustering algorithm and save model
         model = cluster_journeys(X_data, algorithm, numClusters)
-        newClusterID, model_path = save_cluster_model(
+        newClusterID, model_path = save_cluster_model(staff=request.user.username, staff_id=request.user.id, data_source=data_source_name,
                             startDate=startDate, endDate=endDate, algorithm=algorithm, 
                             preprocess=preprocessMethod, numClusters=numClusters, clusterModel=model)
 
@@ -388,7 +458,7 @@ def get_trace_clustering(request):
         for index, clustered_journey in enumerate(list_clustered_journeys):
             graph, net = get_process_discovery(clustered_journey, miningAlgorithm)
             graphLink = save_cluster_graph(
-                graph, newClusterID, index, miningAlgorithm)
+                request.user.username, request.user.id, graph, newClusterID, index, miningAlgorithm)
             graphLinks.append(graphLink)
 
         return render(
@@ -398,7 +468,8 @@ def get_trace_clustering(request):
                             "graphLinks": graphLinks,
                             "preprocessing_methods": preprocessing_methods,
                             "clustering_algorithms": clustering_algorithms,
-                            "mining_algorithms": mining_algorithms
+                            "mining_algorithms": mining_algorithms,
+                            "data_sources": data_sources
                         }
                     )
 
@@ -408,13 +479,18 @@ def get_cluster_user(request, id):
     if (request.method == "POST"):
         clusterID               = id
         startDate, endDate      = get_period(request)
-        touchpoints             = get_list_touchpoints(startDate, endDate)
+        data_sources_set     =   Data_Source.objects.filter(staff_id=request.user.id) | Data_Source.objects.filter(is_public=True)
+        data_sources = list(data_sources_set.values('name', 'id'))
+        data_source = request.POST['data-source']
+        data_source_name = get_data_source(data_source)
+        touchpoints             = get_list_touchpoints(startDate, endDate, data_source, request.user.id)
 
         if (len(touchpoints) == 0):
             return render(
                             request, 
                             "graph_model/cluster-customer.html", 
                             {
+                                "data_sources": data_sources,
                                 "clusterID": clusterID, 
                                 "result": "No available touchpoints"
                             }
@@ -449,13 +525,14 @@ def get_cluster_user(request, id):
                 clusterGraphs) if clusterGraph["clusterNumber"] == cluster_index][0]
 
             cluster_graph_id = clusterGraphs[graph_index]["id"]
-            save_clustered_user(customer_id, startDate, endDate,
+            save_clustered_user(request.user.username, request.user.id, data_source_name, customer_id, startDate, endDate,
                               user_journey, cluster_graph_id)
 
         return render(
                         request, 
                         "graph_model/cluster-customer.html", 
                         {
+                            "data_sources": data_sources,
                             "clusterID": clusterID, 
                             "clusterSuccess": True
                         }
@@ -513,7 +590,7 @@ def convert_net_to_arr(net):
 
     return net_arr
 
-def save_decision_graph(tree, startDate, endDate, journeyProcessID, processGraphLink):
+def save_decision_graph(staff, staff_id, data_source, tree, startDate, endDate, journeyProcessID, processGraphLink):
     filename = 'graph_model/decisionGraph/' + str(datetime.now().timestamp()) + ".gv"
     (static_path, link_url) = get_static_path(filename, 'graph_model')
     
@@ -521,14 +598,14 @@ def save_decision_graph(tree, startDate, endDate, journeyProcessID, processGraph
     filename = filename + '.png'
     link_url = link_url + '.png'
 
-    newGraph = Decision_Process_Graph.objects.create(
+    newGraph = Decision_Process_Graph.objects.create(staff=staff, staff_id=staff_id, data_source=data_source, 
         runDate=datetime.now(), startDate=startDate, endDate=endDate, journeyProcessID=journeyProcessID,
         processGraphLink=processGraphLink, decisionGraphLink=link_url)
     newGraph.save()
 
     return filename, newGraph.id
 
-def save_action_graph(tree, actionName, decisionMiningID):
+def save_action_graph(staff, staff_id, tree, actionName, decisionMiningID):
     filename = 'graph_model/decisionGraph/' + str(datetime.now().timestamp()) + ".gv"
     (static_path, link_url) = get_static_path(filename, 'graph_model')
     
@@ -536,7 +613,7 @@ def save_action_graph(tree, actionName, decisionMiningID):
     filename = filename + '.png'
     link_url = link_url + '.png'
 
-    newGraph = Decision_Action_Graph.objects.create(action=actionName, decisionProcessID=decisionMiningID, actionGraphLink=link_url)
+    newGraph = Decision_Action_Graph.objects.create(staff=staff, staff_id=staff_id, action=actionName, decisionProcessID=decisionMiningID, actionGraphLink=link_url)
     newGraph.save()
 
     return filename
@@ -553,9 +630,14 @@ def get_period(request):
     return startDate, endDate
 
 
-def get_list_touchpoints(startDate, endDate):
-    touchpoints = Touchpoint.objects.filter(time__range=[startDate, endDate]).values(
-        'customer_id', 'time', 'action_type__name', 'device_browser__name', 'device_os__name', 'device_category__name')
+def get_list_touchpoints(startDate, endDate, data_source=None, user_id=None):
+    if (data_source == 'all'):
+        touchpoints_set = Touchpoint.objects.filter(time__range=[startDate, endDate], data_source__is_public=True)
+        touchpoints = touchpoints_set.values(
+            'customer_id', 'time', 'action_type__name', 'device_browser__name', 'device_os__name', 'device_category__name', 'channel_type__name')
+    else:
+        touchpoints = Touchpoint.objects.filter(time__range=[startDate, endDate], data_source=data_source).values(
+            'customer_id', 'time', 'action_type__name', 'device_browser__name', 'device_os__name', 'device_category__name', 'channel_type__name')
     touchpoints = list(touchpoints)
 
     return touchpoints
@@ -658,27 +740,27 @@ def predict_journey_cluster(algorithm, X_data, clusterModelFile):
     return clusters, Y_predict
 
 
-def save_process_graph(gviz, startDate, endDate, type):
+def save_process_graph(staff, staff_id, data_source, gviz, startDate, endDate, type):
     filename = 'graph_model/journeyProcessGraph/' + \
         str(datetime.now().timestamp()) + ".png"
 
     (static_path, link_url) = get_static_path(filename, 'graph_model')
     save_graph_file(type, gviz, static_path)
 
-    newGraph = Journey_Process_Graph.objects.create(runDate=datetime.now(
+    newGraph = Journey_Process_Graph.objects.create(staff=staff, staff_id=staff_id, data_source=data_source, runDate=datetime.now(
     ), startDate=startDate, endDate=endDate, type=type, link=link_url)
     newGraph.save()
 
     return filename, newGraph.id, link_url
 
 
-def save_cluster_graph(gviz, clusterID, clusterNumber, type, clusterName=None):
+def save_cluster_graph(staff, staff_id, gviz, clusterID, clusterNumber, type, clusterName=None):
     filename = 'graph_model/journeyClusterGraph/' + \
         str(datetime.now().timestamp()) + ".png"
 
     (static_path, link_url) = get_static_path(filename, 'graph_model')
     save_graph_file(type, gviz, static_path)
-    newGraph = Clustered_Journey_Graph.objects.create(clusterModelID=clusterID, clusterNumber=clusterNumber, clusterName=clusterName, type=type, link=link_url)
+    newGraph = Clustered_Journey_Graph.objects.create(staff=staff, staff_id=staff_id, clusterModelID=clusterID, clusterNumber=clusterNumber, clusterName=clusterName, type=type, link=link_url)
     newGraph.save()
 
     return filename
@@ -703,12 +785,12 @@ def save_graph_file(type, gviz, path):
         pn_visualizer.save(gviz, path)
 
 
-def save_cluster_model(startDate, endDate, algorithm, preprocess, numClusters,  clusterModel, preprocessModel=None, accuracy=0):
+def save_cluster_model(staff, staff_id, data_source, startDate, endDate, algorithm, preprocess, numClusters,  clusterModel, preprocessModel=None, accuracy=0):
     filename = 'graph_model/journeyClusterModel/' + str(datetime.now().timestamp()) + ".sav"
     (static_path, link_url) = get_static_path(filename, 'graph_model')
     joblib.dump(clusterModel, static_path)
 
-    newModel = Journey_Cluster_Model.objects.create(startDate=startDate,
+    newModel = Journey_Cluster_Model.objects.create(staff=staff, staff_id=staff_id, data_source=data_source, startDate=startDate,
                                                     endDate=endDate,
                                                     algorithm=algorithm,
                                                     preprocessing=preprocess,
@@ -719,9 +801,9 @@ def save_cluster_model(startDate, endDate, algorithm, preprocess, numClusters,  
     return newModel.id, static_path
 
 
-def save_clustered_user(userID, startJourneyDate, endJourneyDate, journey, cluster_number_id):
+def save_clustered_user(staff, staff_id, data_source, userID, startJourneyDate, endJourneyDate, journey, cluster_number_id):
     cluster = Clustered_Journey_Graph.objects.get(id=cluster_number_id)
-    newClusteredUser = Clustered_Customer.objects.create(customer_id=userID,
+    newClusteredUser = Clustered_Customer.objects.create(staff=staff, staff_id=staff_id, data_source=data_source, customer_id=userID,
                                                          fromDate=startJourneyDate,
                                                          toDate=endJourneyDate,
                                                          journey=journey,

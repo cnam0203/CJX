@@ -13,9 +13,8 @@ from .models import Decision_Action_Graph
 # Register your models here.
 
 class Journey_Process_Graph_Admin(admin.ModelAdmin):
-    search_fields = ("id", "startDate", "endDate", "runDate", "type")
-    list_display = ("id", "startDate", "endDate",
-                    "runDate", "type", "image")
+    search_fields = ("id", "runDate", "staff", "data_source", "type")
+    list_display = ("id", "runDate", "staff", "data_source", "type", "image")
 
     def image(self, obj):
         return format_html("<a href='{url}'>{url}</a>", url=obj.link)
@@ -23,9 +22,8 @@ class Journey_Process_Graph_Admin(admin.ModelAdmin):
 
 
 class Decision_Process_Graph_Admin(admin.ModelAdmin):
-    search_fields = ("id", "startDate", "endDate", "runDate")
-    list_display = ("id", "startDate", "endDate",
-                    "runDate", "journeyProcess", "processGraph", "decisionGraph")
+    search_fields = ("id","runDate", "staff", "data_source")
+    list_display = ("id", "runDate", "staff", "data_source", "journeyProcess", "processGraph", "decisionGraph")
 
     def journeyProcess(self, obj):
         link = "/admin/graph_models/journey_process_graph/" + str(obj.journeyProcessID)
@@ -67,9 +65,9 @@ class Clustered_Journey_Graph_Admin(admin.ModelAdmin):
     image.allow_tags = True
 
 class Journey_Cluster_Model_Admin(admin.ModelAdmin):
-    search_fields = ("startDate", "endDate", "runDate",
+    search_fields = ("runDate", "staff", "data_source", 
                      "algorithm", "preprocessing", "numberClusters")
-    list_display = ("id", "runDate", "algorithm", "preprocessing",
+    list_display = ("id", "runDate",  "staff", "data_source", "algorithm", "preprocessing",
                     "numberClusters", "accuracy", "cluster_now")
 
     def cluster_now(self, obj):

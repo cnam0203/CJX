@@ -11,12 +11,21 @@
     <script src="https://code.highcharts.com/modules/export-data.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
     <div class="create-container" data-aos="fade-up">
-        <div class="table-name">Real-time Report</div>
+        <div class="table-name">Daily Report</div>
         <form class="configuration" action="/admin/journey/report" method="post" name="form" onsubmit="return validateForm()" id="form" >
             {% csrf_token %}
             <div class="center-configure">
                 <div class="configure-txt overflow-txt">Configuration</div>
                 <div class="configure-container">
+                    <div class="select-container">
+                        <label class="select-label">Data Source</label>
+                        <select id="mining-algorithm" name="dataSource" class="select-input">
+                            <option value= {{ 'all' }}>All</option>
+                            {% for source in data_sources%}
+                                <option value= {{ source.id }}>{{ source.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                     <div class="select-container">
                         <label class="select-label">From</label>
                         <input type="date" name="startDate" class="select-input"/>

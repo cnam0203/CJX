@@ -17,7 +17,9 @@
                 </div>
             {% endfor %}
             <div class="btn">
-                <button type="sumbit" class="form-btn">Save</button>
+                {% if formName == 'Form clustered_journey_graph' %}
+                    <button type="sumbit" class="form-btn">Save</button>
+                {% endif %}
             </div>
         </form>
     </div>

@@ -15,6 +15,8 @@ from .models import Action_Type
 from .models import Journey_Customer
 from .models import Matching_Column
 from .models import Matching_Report
+from .models import Data_Source
+from .models import Import_File_Log
 
 
 # Register your models here.
@@ -58,6 +60,14 @@ class Experience_Emotion_Admin(admin.ModelAdmin):
 class Journey_Customer_Admin(admin.ModelAdmin):
     list_display = ("id", "customerID", "register_date")
 
+class Data_Source_Admin(admin.ModelAdmin):
+    list_display = ("id", "name", "created_date", "staff_create", "last_update", "is_public")
+    fields = ["name", "is_public"]
+    
+
+class Import_File_Log_Admin(admin.ModelAdmin):
+    list_display = ("id", "import_date", "number_rows", "staff")
+
 class Matching_Report_Admin(admin.ModelAdmin):
     list_display = ("id", "name", "instruction")
 
@@ -86,3 +96,5 @@ admin.site.register(Experience_Emotion, Experience_Emotion_Admin)
 admin.site.register(Journey_Customer, Journey_Customer_Admin)
 admin.site.register(Matching_Column, Matching_Column_Admin)
 admin.site.register(Matching_Report, Matching_Report_Admin)
+admin.site.register(Data_Source, Data_Source_Admin)
+admin.site.register(Import_File_Log, Import_File_Log_Admin)

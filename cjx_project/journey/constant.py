@@ -1,4 +1,4 @@
-from .forms import Touchpoint_Form, Journey_Customer_Form, Action_Type_Form, Channel_Type_Form, Source_Type_Form, Device_Browser_Form, Device_OS_Form, Device_Category_Form, Interact_Item_Type_Form, Experience_Emotion_Form, Matching_Report_Form, Matching_Column_Form
+from .forms import Touchpoint_Form, Journey_Customer_Form, Action_Type_Form, Channel_Type_Form, Source_Type_Form, Device_Browser_Form, Device_OS_Form, Device_Category_Form, Interact_Item_Type_Form, Experience_Emotion_Form, Matching_Report_Form, Matching_Column_Form, Data_Source_Form, Import_File_Log_Form
 
 formData = {
     'touchpoint'            : Touchpoint_Form,
@@ -12,7 +12,9 @@ formData = {
     'interact_item_type'    : Interact_Item_Type_Form,
     'experience_emotion'    : Experience_Emotion_Form,
     'matching_column'       : Matching_Column_Form,
-    'matching_report'       : Matching_Report_Form
+    'matching_report'       : Matching_Report_Form,
+    'data_source'           : Data_Source_Form,
+    'import_file_log'       : Import_File_Log_Form,
 }
 
 functions = ['lower', 'upper', 'string', 'int', 'float', 'datetime', 'date']

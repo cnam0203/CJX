@@ -5,6 +5,9 @@ from django.db import models
 
 class Journey_Cluster_Model(models.Model):
     id = models.AutoField(primary_key=True)
+    staff = models.CharField(max_length=50, blank=True, null=True)
+    staff_id = models.IntegerField(blank=True, null=True)
+    data_source = models.CharField(max_length=50, blank=True, null=True)
     startDate = models.DateTimeField()
     endDate = models.DateTimeField()
     numberClusters = models.IntegerField(blank=True, null=True)
@@ -19,6 +22,8 @@ class Journey_Cluster_Model(models.Model):
 
 class Clustered_Journey_Graph(models.Model):
     id = models.AutoField(primary_key=True)
+    staff = models.CharField(max_length=50, blank=True, null=True)
+    staff_id = models.IntegerField(blank=True, null=True)
     clusterModelID = models.IntegerField(blank=True, null=True)
     clusterNumber = models.IntegerField(blank=True, null=True)
     clusterName = models.CharField(
@@ -32,6 +37,9 @@ class Clustered_Journey_Graph(models.Model):
 
 class Journey_Process_Graph(models.Model):
     id = models.AutoField(primary_key=True)
+    staff = models.CharField(max_length=50, blank=True, null=True)
+    staff_id = models.IntegerField(blank=True, null=True)
+    data_source = models.CharField(max_length=50, blank=True, null=True)
     startDate = models.DateTimeField()
     endDate = models.DateTimeField()
     runDate = models.DateTimeField()
@@ -41,6 +49,9 @@ class Journey_Process_Graph(models.Model):
 
 class Decision_Process_Graph(models.Model):
     id = models.AutoField(primary_key=True)
+    staff = models.CharField(max_length=50, blank=True, null=True)
+    staff_id = models.IntegerField(blank=True, null=True)
+    data_source = models.CharField(max_length=50, blank=True, null=True)
     startDate = models.DateTimeField()
     endDate = models.DateTimeField()
     runDate = models.DateTimeField()
@@ -50,12 +61,17 @@ class Decision_Process_Graph(models.Model):
 
 class Decision_Action_Graph(models.Model):
     id = models.AutoField(primary_key=True)
+    staff = models.CharField(max_length=50, blank=True, null=True)
+    staff_id = models.IntegerField(blank=True, null=True)
     action = models.CharField(max_length=150, blank=True, null=True)
     decisionProcessID = models.IntegerField(blank=True, null=True)
     actionGraphLink = models.CharField(max_length=150, blank=True, null=True)
 
 class Clustered_Customer(models.Model):
     customer_id = models.BigIntegerField(blank=True, null=True)
+    data_source = models.CharField(max_length=50, blank=True, null=True)
+    staff = models.CharField(max_length=50, blank=True, null=True)
+    staff_id = models.IntegerField(blank=True, null=True)
     clusterDate = models.DateTimeField(auto_now=True)
     fromDate = models.DateField()
     toDate = models.DateField()

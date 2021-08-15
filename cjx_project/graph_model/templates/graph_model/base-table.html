@@ -39,7 +39,13 @@
                         {% elif value.value %}
                             <a href='{{value.link}}' class="table-column" style="color:#FF8484">{{value.value}}</a>
                         {% else %}
-                            <div class="table-column">{{ value }}</div>
+                            <div class="table-column">
+                                {% if value.year %}
+                                    {{ value|date:"Y-m-d" }} {{ value|time:"H:i" }}
+                                {% else %}
+                                    {{ value }}
+                                {% endif %}
+                            </div>
                         {% endif %}
                     {% endfor %}
                 </div>

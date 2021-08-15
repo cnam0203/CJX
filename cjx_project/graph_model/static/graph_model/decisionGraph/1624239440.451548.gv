@@ -1,5 +1,0 @@
-digraph {
-	start [label=start color=red shape=oval]
-	"visit shop" [label="visit shop" color=red shape=oval]
-	start -> "visit shop" [label="100%" color=red shape=oval]
-}

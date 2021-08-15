@@ -18,9 +18,11 @@
                     </a>
                 </div>
             </div>
-            <div class="configure">
-                <a href='/journey/form/create/{{tableName}}' class="add-btn">Add new item</a>
-            </div>
+                <div class="configure">
+                    {% if tableName == 'data_source' %}
+                        <a href='/journey/form/create/{{tableName}}' class="add-btn">Add new item</a>
+                    {% endif %}
+                </div>
         </div>
         <div class="table-content">
             <div class="table-header">
@@ -31,7 +33,6 @@
                         <div class="header-field" style='color: #F04444'>{{ header }}</div>
                     {% endif %}
                 {% endfor %}
-                <div class="header-field">delete</div>
             </div>
             {% for row in data %}
                 <div class="table-row">
@@ -41,15 +42,22 @@
                         {% elif value.value %}
                             <a href='{{value.link}}' class="table-column" style="color:#FF8484">{{value.value}}</a>
                         {% else %}
-                            <div class="table-column">{{ value }}</div>
+                            <div class="table-column">
+                                {% if value.year %}
+                                    {{ value|date:"Y-m-d" }} {{ value|time:"H:i" }}
+                                {% else %}
+                                    {{ value }}
+                                {% endif %}
+                            </div>
                         {% endif %}
                     {% endfor %}
-                    <a href='/journey/form/delete/{{tableName}}/{{row.id}}' class="table-column" style="color:#FF8484">Delete</a>
                 </div>
             {% endfor %}
         </div>
     </div>
     <script>
         AOS.init({duration: 1500,});
+        var data = "{{data}}";
+        console.log(data)
     </script>
 {% endblock %}

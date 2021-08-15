@@ -6,58 +6,65 @@
     <div class="documentation-container">
         <div class="documentation-name">Documentation - Data Model</div>
         <div id="content-container">
-            <p class="header-content">1.  Channel:</p>
+            <p class="header-content">1.  Data Source:</p>
+            <p class="main-content">Data Source is the source that users get touchpoint data to import </p>
+            <ul>
+                <li class="list-content">ID            : ID of data source</li>
+                <li class="list-content">Name          : name of data source</li>
+            </ul>
+            <p class="header-content">2.  Channel:</p>
             <p class="main-content">Channel is the method chosen by the customer to interact with the touchpoint, such as a “company’s website”, “mobile application”, or “call center”... </p>
             <ul>
                 <li class="list-content">ID            : ID of channel</li>
                 <li class="list-content">Name          : name of channel (website, app, store,...)</li>
             </ul>
-            <p class="header-content">2.  Traffic_Source:</p>
+            <p class="header-content">3.  Traffic_Source:</p>
             <p class="main-content">This section contains information about the Traffic Source from which the session originated. For example, consider a man who watched an advertisement from Youtube about a book. He clicked on the advertisement link to access the home page and view the product details. Let ViewProductDetails be a touchpoint. The trafficSource of this touchpoint is defined as Youtube.</p>
             <ul>
                 <li class="list-content">ID            : ID of traffic source</li>
                 <li class="list-content">Name          : name of traffic source (Youtube, Google, Facebook,...)</li>
             </ul>
-            <p class="header-content">3.  Device_Browser:</p>
+            <p class="header-content">4.  Device_Browser:</p>
             <p class="main-content">This section contains information about the browser that customers used to interact with the company</p>
             <ul>
                 <li class="list-content">ID            : ID of browser</li>
                 <li class="list-content">Name          : name of browser (chrome, safari, edge,...)</li>
             </ul>
-            <p class="header-content">4.  Device_OS:</p>
+            <p class="header-content">5.  Device_OS:</p>
             <p class="main-content">This section contains information about the operating system that customers used to interact with the company</p>
             <ul>
                 <li class="list-content">ID            : ID of operating system</li>
                 <li class="list-content">Name          : name of operating system (Windows, MacOS, Ubuntu,...)</li>
             </ul>
-            <p class="header-content">5.  Device_Category:</p>
+            <p class="header-content">6.  Device_Category:</p>
             <p class="main-content">This section contains information about the customer’s device</p>
             <ul>
                 <li class="list-content">ID            : ID of device category</li>
                 <li class="list-content">Name          : name of device category (smartphone, tablet, laptop,...)</li>
             </ul>
-            <p class="header-content">6.  Interact_Item:</p>
+            <p class="header-content">7.  Interact_Item:</p>
             <p class="main-content">This section contains information about the item that customer interacted through touchpoint</p>
             <ul>
                 <li class="list-content">ID            : ID of interact item</li>
                 <li class="list-content">Name          : name of interact item (product, transaction, video, ...)</li>
             </ul>
-            <p class="header-content">7.  Experience_Emotion:</p>
+            <p class="header-content">8.  Experience_Emotion:</p>
             <p class="main-content">Using only one continuum of emotions–such as unhappy to happy– may fail to depict a customer’s experience</p>
             <ul>
                 <li class="list-content">ID            : ID of experience emotion</li>
                 <li class="list-content">Name          : name of experience emotion (happy, angry, satisfied, ...)</li>
             </ul>
-            <p class="header-content">8.  Action:</p>
+            <p class="header-content">9.  Action:</p>
             <p class="main-content">Action is a verb that’s denoted for each touchpoint. In other words, a touchpoint is described by an action. A customer can iterate a few times over the same action. Each action will be related to a service, a product, or a context it affects. In general, we call these services or products that belong to a company “interact item”</p>
             <ul>
                 <li class="list-content">ID            : ID of action</li>
                 <li class="list-content">Name          : name of action (ask for information, technical support, view product info, view product list, ...)</li>
             </ul>
-            <p class="header-content">1.  Touchpoint:</p>
+            <p class="header-content">10.  Touchpoint:</p>
             <p class="main-content">An interaction between customers and a company’s products or services at any time through a channel. A touchpoint was described by action through a channel. The stage indicates which stage this touchpoint belongs to. A touchpoint must provide</p>
             <ul>
                 <li class="list-content">Customer_ID            : ID of customer who executed the touchpoint</li>
+                <li class="list-content">Data_Source            : referenced to DataSource Model</li>
                 <li class="list-content">Action_Type            : referenced to Action Model</li>
                 <li class="list-content">Time                   : moment when customer executed the touchpoint</li>
                 <li class="list-content">Channel_Type           : referenced to Channel Model</li>

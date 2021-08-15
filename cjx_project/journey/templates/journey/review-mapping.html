@@ -4,15 +4,15 @@
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'journey/css/review-mapping.css' %}">
     <div class="review-container">
-        <div class="review-title">Review Mapping File</div>
+        <div class="review-title">Review Matching File</div>
         <div class="review-configure">
             <div class="center-configure">
                 <div class="select-box">
-                    <label class="select-label">Data source:</label>
+                    <label class="select-label">Filename:</label>
                     <select name="select-input" id="select-input" onchange='readInstruction(this)'>
-                        <option class="select-choice" value="">Choose mapping file</option>
+                        <option class="select-choice" value=""></option>
                         {% for source in dataSrcs %}
-                            <option class="select-choice" value={{ source.name }}>{{ source.name }}</option>
+                            <option class="select-choice" value={{ source.id }}>{{ source.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -23,9 +23,9 @@
                 <div class="mapping-table">
                     <div class="mapping-name">{{ dataSrcName }}</div>
                     <div class="table-header">
-                        <div class="header-file">Mapping column</div>
-                        <div class="header-file">Touchpoint column</div>
-                        <div class="header-file">Mapping Function</div>
+                        <div class="header-file">Column name</div>
+                        <div class="header-file">Touchpoint field</div>
+                        <div class="header-file">Matching Function</div>
                     </div>
                     {% for matchingPair in listMatchingFields%}
                         <div class="table-row">
