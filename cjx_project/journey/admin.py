@@ -17,6 +17,7 @@ from .models import Matching_Column
 from .models import Matching_Report
 from .models import Data_Source
 from .models import Import_File_Log
+from .models import Data_Source_Permission
 
 
 # Register your models here.
@@ -84,6 +85,11 @@ class Channel_Type_Admin(admin.ModelAdmin):
 class Action_Type_Admin(admin.ModelAdmin):
     list_display = ("id", "name")
 
+
+class Data_Source_Permission_Admin(admin.ModelAdmin):
+    list_display = ("id", "data_source", "user")
+
+admin.site.register(Data_Source_Permission, Data_Source_Permission_Admin)
 admin.site.register(Touchpoint, TouchpointAdmin)
 admin.site.register(Channel_Type, Channel_Type_Admin)
 admin.site.register(Action_Type, Action_Type_Admin)

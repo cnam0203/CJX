@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 
 
 
-from .models import Touchpoint, Journey_Customer, Action_Type, Channel_Type, Traffic_Source_Type, Device_Browser, Device_OS, Device_Category, Device_Category, Interact_Item_Type, Experience_Emotion, Matching_Report, Matching_Column, Data_Source, Import_File_Log
+from .models import Touchpoint, Journey_Customer, Action_Type, Channel_Type, Traffic_Source_Type, Device_Browser, Device_OS, Device_Category, Device_Category, Interact_Item_Type, Experience_Emotion, Matching_Report, Matching_Column, Data_Source, Import_File_Log, Data_Source_Permission
 from .constant import formData, functions, documentation_pages
 
 from utils.path_helper import get_static_path
@@ -131,8 +131,7 @@ def import_csv_file(request):
             else:                       # If invalid, response import failed
                 return JsonResponse({"status": 400, "result": "Import failed"})
 
-
-        import_file_log = Import_File_Log(number_rows=len(valid_touchpoints), staff=request.user.username, staff_id=request.user.id)
+        import_file_log = Import_File_Log(number_rows=len(valid_touchpoints), staff=request.user.username, staff_id=request.user.id, data_source_id=body['dataSource'])
         import_file_log.save()
 
         for valid_touchpoint in valid_touchpoints:
@@ -319,13 +318,19 @@ def get_list_data(request, tablename):
 
     elif (tablename == 'import_file_log'):
         data        = list(Model.objects.filter(staff_id=request.user.id).values())
-        headers     = ['id', 'import_date', 'number_rows', 'listTouchpoint', 'delete']
+        headers     = ['id', 'import_date', 'data_source', 'number_rows', 'listTouchpoint', 'delete' ]
 
         for obj in data:
+            try:
+                data_source_name = Data_Source.objects.get(id=obj['data_source_id']).name
+            except:
+                data_source_name = "undefined"
+
+            obj['data_source']           = data_source_name
+
             obj['listTouchpoint']           = {}
             obj['listTouchpoint']['link']   = '/journey/table/touchpoint/?import_file=' + str(obj['id'])
             obj['listTouchpoint']['value']  = 'view'
-
 
             obj['delete']           = {}
             obj['delete']['link']   = '/journey/form/delete/import_file_log/' + str(obj['id'])
@@ -446,8 +451,10 @@ def delete_form_data(request, tablename, id=None):
 @login_required(login_url="/authentication/login")
 def get_import_page(request):
     all_fields          =   {}
-    data_sources_set     =   Data_Source.objects.filter(staff_id=request.user.id) | Data_Source.objects.filter(is_public=True)
-    data_sources = list(data_sources_set.values('name', 'id'))
+    
+    data_source_permission = [source.data_source for source in list(Data_Source_Permission.objects.filter(user=request.user.id))]
+    data_sources_set    =   Data_Source.objects.filter(staff_id=request.user.id) | Data_Source.objects.filter(id__in=data_source_permission)
+    data_sources        =   list(data_sources_set.values('name', 'id'))
     matching_reports    =   [report for report in Matching_Report.objects.filter(staff_id=request.user.id)]
     matched_columns     =   [
                                 {
@@ -457,8 +464,6 @@ def get_import_page(request):
                                     'function'      : column.function
                                 } for column in list(Matching_Column.objects.filter(report__staff_id=request.user.id))
                             ]
-
-    print(matched_columns)
 
     for field in Touchpoint._meta.get_fields():
         if (field.name != "id" and field.name != "record_time"):

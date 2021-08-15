@@ -1,6 +1,7 @@
 from django.db import models
 from django.apps import apps
 from django.utils.timezone import now
+from django.contrib.auth.admin import User
 
 # Create your models here.
 
@@ -77,6 +78,7 @@ class Import_File_Log(models.Model):
     number_rows = models.BigIntegerField(blank=False, null=True)
     staff = models.CharField(max_length=50, blank=True, null=True)
     staff_id = models.CharField(max_length=50, blank=True, null=True)
+    data_source_id = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.import_date}"
@@ -137,5 +139,15 @@ class Matching_Column(models.Model):
     journey_column = models.CharField(max_length=50, blank=False, null=True)
     report_column = models.CharField(max_length=50, blank=True, null=True)
     function = models.CharField(max_length=50, blank=True, null=True, choices=functions)
+
+
+class Data_Source_Permission(models.Model):
+    users = [(user.id, user.username) for user in list(User.objects.all())]
+    data_sources = [(source.id, source.name) for source in list(Data_Source.objects.filter(is_public=True))]
+
+    data_source = models.IntegerField(choices=data_sources)
+    user = models.IntegerField(choices=users)
+    class Meta:
+        unique_together = (("data_source", "user"),)
 
 

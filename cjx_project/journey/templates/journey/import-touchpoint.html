@@ -1,0 +1,48 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+        <div style="width: 100%;text-align:center">
+            <h1>Customer Experience Management</h1>
+            <h2>IMPORT DATA</h2>
+            <br/>
+            <label>UPLOAD CSV/JSON FILE: </label>
+            <input type="file" 
+                    id="upload-csv" 
+                    accept=".csv, .json" 
+                    style="width: 86px"
+                    onchange="importFile({{ allFields }}, {{ matchedColumns }});"
+            />
+            <br/>
+            <br/>
+            <div id="select-mapping-type" style="display: none">
+                <label>CHOOSE MAPPING TYPE: </label>
+                <select id='report' name='report' onchange='mapFile(this)'>
+                    <option value=''>Select Mapping Type</option>
+                    {% for report in matchingReports%}
+                        <option value= {{ report.name }}>{{ report.name }}</option>
+                    {% endfor %}
+                    <option value='manipulate'>Manually matching</option>
+                </select>
+            </div>
+            <br/>
+            <br/>
+            <input type="submit" 
+                    value='Import' 
+                    id="submit-file" 
+                    style="display:none" 
+                    onclick="submitTouchpoint();"
+            />
+        </div>
+            <br/>
+            <br/>
+        <div id="file-container">
+            <div style="overflow-x:auto;">
+                <table id="tbl-csv-data" style="margin:auto">
+                </table>
+            </div>
+        </div>
+        {% load static %}  
+        <script src="{% static '/journey/js/papaparse.min.js' %}" type="text/javascript"></script>
+        <script src="{% static '/journey/js/utils.js' %}" type="text/javascript"></script> 
+        <script src="{% static '/journey/js/import-touchpoint.js' %}" type="text/javascript"></script> 
+{% endblock %}
