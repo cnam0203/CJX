@@ -1,7 +1,7 @@
 ![logo](https://user-images.githubusercontent.com/47789251/129663401-e1c28faf-a96f-49f6-a146-497c912df041.gif)
 
 # Customer Journey Master
-Customer Journey Master is a Web Management Application written by Python's Django webframework, targeting small and medium businesses, assisting them in collecting and managing customer journey data from multiple sources and channels in one place, analyzing and exploiting the journey based on Process Mining and Machine Learning techniques.
+Customer Journey Master is a Web Management Application written by Python's Django web framework, targeting small and medium businesses, assisting them in collecting and managing customer journey data from multiple sources and channels in one place, analyzing and exploiting the journey based on Process Mining and Machine Learning techniques.
 
 ## Main Functions
   1. Create data sources (dataset) for analyzing customer journey data
