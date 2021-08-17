@@ -1,0 +1,132 @@
+* { 
+    -moz-box-sizing: border-box; 
+    -webkit-box-sizing: border-box; 
+     box-sizing: border-box; 
+}
+
+.center-content {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    height: auto;
+}
+
+.activity-user {
+    width: 100%;
+    margin-bottom: 30px;
+    overflow: auto;
+}
+
+.activity-table-container {
+    width: 70%;
+    float: left;
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0px 4px 3px #d1d1d1;
+    text-align: center;
+    padding: 15px;
+    height: auto;
+}
+
+.table-name {
+    font-size: 30px;
+    font-weight: 400;
+    color: #EA1313;
+    margin: 0;
+}
+
+.activity-table {
+    margin-top: 20px; 
+    width: 100%;
+}
+
+.table-header {
+    border-bottom: 1px #707070 solid;
+    margin-bottom: 15px;
+    display: flex;
+    width: 100%;
+    padding: 10px 0;
+}
+
+.table-header div {
+    font-weight: 400;
+    padding: 0;
+    float: left;
+    width: 16%;
+}
+
+.table-row {
+    border: 1px #707070 solid;
+    border-radius: 20px;
+    margin: 0px 0px 5px 0px;
+    display: flex;
+    width: 100%;
+    padding: 10px;
+}
+
+.table-column {
+    font-weight: 100;
+    float: left;
+    width: 16%;
+    font-family: 'Avenir';
+    display: flex;
+    vertical-align: middle;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.row-field {
+    padding: 10px 15px;
+    width: 80%;
+    margin: auto;
+    border-radius: 40px;
+    display: flex;
+    vertical-align: middle;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.number-user {
+    float: right;
+    width: 28%;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0px 4px 3px #d1d1d1;
+    height: auto;
+    display: block;
+}
+
+.number-user-container {
+    width: 90%;
+    margin: auto;
+}
+
+#number-user-above {
+    border-bottom: 1px #E6DBDB solid;
+}
+
+
+.chart-container {
+    width: 100%;
+    display: flex;
+    flex-direction:row;
+}
+
+.chart {
+    flex:1 1 auto;
+    margin: 5px;
+    border-radius: 20px;
+    box-shadow: 0px 4px 3px #d1d1d1;
+    background-color: #ffffff;
+    text-align: center;
+    padding: 20px;
+    width: 100%;
+}
+
+.chart-name {
+    font-size: 20px;
+    margin: 0px;
+}

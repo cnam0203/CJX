@@ -1,5 +1,7 @@
 from django.db import models
 from django.apps import apps
+from django.utils.timezone import now
+from django.contrib.auth.admin import User
 
 # Create your models here.
 
@@ -9,7 +11,7 @@ class Channel_Type(models.Model):
     def __str__(self):
         return str(self.name)
 
-class Source_Type(models.Model):
+class Traffic_Source_Type(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True, unique=True)
 
     def __str__(self):
@@ -49,7 +51,6 @@ class Experience_Emotion(models.Model):
         return str(self.name)
         
 
-
 class Action_Type(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True, unique=True)
 
@@ -58,12 +59,35 @@ class Action_Type(models.Model):
 
 class Journey_Customer(models.Model):
     customerID  = models.BigIntegerField(blank=False, null=True, unique=True)
-    register_date = models.DateTimeField(auto_now=True)
+    register_date = models.DateTimeField(blank=False, default=now)
+
+class Data_Source(models.Model):
+    name = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    created_date = models.DateTimeField(default=now)
+    last_update = models.DateTimeField(blank=False, auto_now=True)
+    staff_create = models.CharField(max_length=50, blank=True, null=True)
+    staff_update = models.CharField(max_length=50, blank=True, null=True)
+    staff_id = models.IntegerField(blank=True, null=True)
+    is_public = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.name}"
+
+class Import_File_Log(models.Model):
+    import_date = models.DateTimeField(default=now)
+    number_rows = models.BigIntegerField(blank=False, null=True)
+    staff = models.CharField(max_length=50, blank=True, null=True)
+    staff_id = models.CharField(max_length=50, blank=True, null=True)
+    data_source_id = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.import_date}"
 
 class Touchpoint(models.Model):
     customer_id            = models.BigIntegerField(blank=False, null=True)
+    data_source            = models.ForeignKey(Data_Source, blank=True, null=True, on_delete=models.CASCADE)
     action_type            = models.ForeignKey(Action_Type, blank=False, null=True, on_delete=models.SET_NULL)
-    visit_time             = models.DateTimeField(blank=False, null=True)
+    time                   = models.DateTimeField(blank=False, null=True)
     channel_type           = models.ForeignKey(Channel_Type, blank=True, null=True, on_delete=models.SET_NULL)
     device_browser         = models.ForeignKey(Device_Browser, blank=True, null=True, on_delete=models.SET_NULL)
     device_os              = models.ForeignKey(Device_OS, blank=True, null=True, on_delete=models.SET_NULL)
@@ -71,58 +95,59 @@ class Touchpoint(models.Model):
     geo_continent          = models.CharField(max_length=50, blank=True, null=True)
     geo_country            = models.CharField(max_length=50, blank=True, null=True)
     geo_city               = models.CharField(max_length=50, blank=True, null=True)
-    source_name            = models.ForeignKey(Source_Type, blank=True, null=True, on_delete=models.SET_NULL)
-    source_url             = models.CharField(max_length=100, blank=True, null=True)
-    ad_url                 = models.CharField(max_length=100, blank=True, null=True)
-    ad_content             = models.CharField(max_length=100, blank=True, null=True)
-    campaign_url           = models.CharField(max_length=100, blank=True, null=True)
-    campaign_content       = models.CharField(max_length=100, blank=True, null=True)
+    traffic_source_name    = models.ForeignKey(Traffic_Source_Type, blank=True, null=True, on_delete=models.SET_NULL)
+    traffic_source_url     = models.CharField(max_length=100, blank=True, null=True)
     store_id               = models.BigIntegerField(blank=True, null=True)
-    store_address          = models.CharField(max_length=100, blank=True, null=True)
     employee_id            = models.BigIntegerField(blank=True, null=True)
-    webpage_id             = models.BigIntegerField(blank=True, null=True)
+    webpage_hostname       = models.CharField(max_length=200, blank=True, null=True)
     webpage_url            = models.CharField(max_length=200, blank=True, null=True)
     webpage_title          = models.CharField(max_length=200, blank=True, null=True)
-    app_screen_id          = models.BigIntegerField(blank=True, null=True)
     app_name               = models.CharField(max_length=50, blank=True, null=True)
-    app_screen             = models.CharField(max_length=50, blank=True, null=True)
     app_screen_title       = models.CharField(max_length=50, blank=True, null=True)
     interact_item_type     = models.ForeignKey(Interact_Item_Type, blank=True, null=True, on_delete=models.SET_NULL)
     interact_item_id       = models.BigIntegerField(blank=True, null=True)
     interact_item_url      = models.CharField(max_length=100, blank=True, null=True)
-    interract_item_content = models.CharField(max_length=500, blank=True, null=True)
+    interact_item_content  = models.CharField(max_length=500, blank=True, null=True)
     experience_score       = models.FloatField(blank=True, null=True)
     experience_emotion     = models.ForeignKey(Experience_Emotion, blank=True, null=True, on_delete=models.SET_NULL)
+    import_log             = models.ForeignKey(Import_File_Log, blank=True, null=True, on_delete=models.CASCADE)
     record_time            = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.customer_id}, {self.visit_time}, {self.action_type}, {self.channel_type}, {self.device_category}, {self.source_name}, {self.experience_emotion}"
+        return f"{self.data_source}, {self.customer_id}, {self.time}, {self.action_type}, {self.channel_type}, {self.device_category}, {self.traffic_source_name}, {self.experience_emotion}"
     
     def save(self, *args, **kwargs):
         #figure out warranty end date
         if Journey_Customer.objects.filter(customerID=self.customer_id).exists() == False:
-            Journey_Customer.objects.create(customerID=self.customer_id, register_date=self.visit_time)
-        else:
-            journey_customer = Journey_Customer.objects.get(customerID=self.customer_id)
-            if (journey_customer.register_date > self.visit_time):
-                journey_customer.register_date = self.visit_time
-                journey_customer.save()
+            Journey_Customer.objects.create(customerID=self.customer_id, register_date=self.time)
         super(Touchpoint, self).save()
 
 
 
 class Matching_Report(models.Model):
     name = models.CharField(max_length=50, blank=False, null=True, unique=True)
+    staff = models.CharField(max_length=150, blank=True, null=True)
+    staff_id = models.IntegerField(blank=True, null=True)
     instruction_link = models.CharField(max_length=150, blank=True, null=True)
 
     def __str__(self):
         return str(self.name)
 
 class Matching_Column(models.Model):
-    functions = [(function, function) for function in ['lower', 'upper', 'datetime']]
-    report = models.ForeignKey(Matching_Report, blank=False, null=True, on_delete=models.SET_NULL)
+    functions = [(function, function) for function in ['lower', 'upper', 'datetime', 'string', 'int', 'float']]
+    report = models.ForeignKey(Matching_Report, blank=False, null=True, on_delete=models.CASCADE)
     journey_column = models.CharField(max_length=50, blank=False, null=True)
     report_column = models.CharField(max_length=50, blank=True, null=True)
     function = models.CharField(max_length=50, blank=True, null=True, choices=functions)
+
+
+class Data_Source_Permission(models.Model):
+    users = [(user.id, user.username) for user in list(User.objects.all())]
+    data_sources = [(source.id, source.name) for source in list(Data_Source.objects.filter(is_public=True))]
+
+    data_source = models.IntegerField(choices=data_sources)
+    user = models.IntegerField(choices=users)
+    class Meta:
+        unique_together = (("data_source", "user"),)
 
 

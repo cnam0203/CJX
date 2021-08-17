@@ -1,0 +1,142 @@
+.review-container {
+    box-shadow: 0px 4px 3px #d1d1d1;
+    background-color: #ffffff;
+    border-radius: 20px;
+    width: 90%;
+    margin: 30px auto;
+    padding: 20px;
+    text-align: center;
+    font-family: 'American Typewriter';
+    position: relative;
+    z-index: 1;
+}
+
+.review-title {
+    margin: auto;
+    color: #EA1313;
+    font-weight: 500;
+    font-size: 30px;
+}
+
+.review-configure {
+    display: flex;
+    margin: 30px 0px;
+    padding: 20px;
+}
+
+.center-configure {
+    width: 100%;
+}
+
+.select-box {
+    width: 70%;
+    margin: auto;
+    background-color: #EFEFEF;
+    border: 0px;
+    border-radius: 10px;
+    display: flex;
+    padding: 20px;
+}
+
+.select-label {
+    width: 30%;
+    font-size: 20px;
+    color: #292929;
+}
+
+#select-input {
+    width: 70%;
+    padding: 5px 20px;
+}
+
+.select-choice {
+    font-size: 20px;
+    color: #292929;
+    font-family: 'American Typewriter';
+}
+
+.mapping-container {
+    width: 100%;
+}
+
+.mapping-table {
+    width: 70%;
+    margin: 30px auto;
+    background-color: #414141;
+    border: 0px;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+}
+
+.mapping-name {
+    width: 100%;
+    text-align: center;
+    font-size: 30px;
+    color: #FF8484;
+    margin-bottom: 20px;
+}
+
+.table-header {
+    margin-bottom: 15px;
+    display: grid;
+    grid-auto-columns: 1fr;
+    width: 100%;
+    padding: 10px 0;
+    overflow-x: auto;
+}
+
+.header-file {
+    grid-row: 1;
+    font-weight: 400;
+    padding: 0;
+    float: left;
+    color: #ffffff;
+    text-align: center;
+    font-size: 20px;
+}
+
+.table-row {
+    background-color: #EFEFEF;
+    margin-bottom: 15px;
+    display: grid;
+    grid-auto-columns: 1fr;
+    width: 100%;
+    padding: 10px 0;
+    overflow-x: auto;
+    border-radius: 10px;
+}
+
+.table-column {
+    grid-row: 1;
+    text-align: center;
+    font-size: 15px;
+    color: #292929;
+    padding: 10px;
+}
+
+.example-container {
+    width: 70%;
+    margin: auto;
+    border: 1px #707070 solid;
+    border-radius: 20px;
+    position: relative;
+    padding: 20px;
+}
+
+.example-txt {
+    margin: auto;
+    color: #403A3A;
+    font-weight: 700;
+    font-size: 20px;
+    padding: 0px 10px;
+    background-color: #ffffff;
+    position: absolute;
+    top: -10px;
+    left: 10px;
+}
+
+.img-instruction {
+    width: 80%;
+}
+

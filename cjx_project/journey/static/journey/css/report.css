@@ -1,0 +1,103 @@
+.create-container {
+    box-shadow: 0px 4px 3px #d1d1d1;
+    background-color: #ffffff;
+    border-radius: 20px;
+    width: 90%;
+    margin: 30px auto;
+    padding: 20px;
+    text-align: center;
+    font-family: 'American Typewriter';
+    position: relative;
+    z-index: 1;
+}
+
+.table-name {
+    margin: auto;
+    color: #EA1313;
+    font-weight: 500;
+    font-size: 30px;
+}
+
+.configuration {
+    width: 90%;
+    display: flex;
+    margin: 30px auto;
+}
+
+.configure-txt {
+    margin: auto;
+    color: #EA1313;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.center-configure {
+    width: 70%;
+    position: relative;
+    display: block;
+    padding: 20px 40px;
+    border: 1px #707070 solid;
+    border-radius: 20px;
+    position: relative;
+}
+
+.configure-container {
+    width: 100%;
+}
+
+.select-container {
+    width: 100%;
+    padding: 10px;
+    background-color: #EFEFEF;
+    margin: 10px 0;
+    display: flex;
+}
+
+.select-label {
+    width: 40%;
+    text-align: left;
+    font-size: 15px;
+}
+
+.select-input {
+    width: 60%;
+    padding: 10px;
+    font-size: 15px;
+    font-family: 'American Typewriter';
+}
+
+.run-btn {
+    margin: auto;
+    border: 1px #707070 solid;
+    background-color: #ffffff;
+    color: #FF8484;
+    padding: 10px 15px;
+    border-radius: 25px;
+    font-size: 15px;
+    font-family: 'American Typewriter';
+}
+
+.configure-btn {
+    width: 30%;
+    position: relative;
+}
+
+.run-btn:hover {
+    cursor: pointer;
+    border: 0;
+    background-color: #FF8484;
+    color: #ffffff;
+}
+
+.overflow-txt {
+    padding: 0px 10px;
+    background-color: #ffffff;
+    position: absolute;
+    top: -10px;
+    left: 10px;
+}
+
+.chart {
+    width: 100%;
+    margin: 30px 0;
+}

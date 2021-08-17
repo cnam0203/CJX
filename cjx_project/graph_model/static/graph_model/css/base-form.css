@@ -1,0 +1,77 @@
+.form-container {
+    box-shadow: 0px 4px 3px #d1d1d1;
+    background-color: #ffffff;
+    border-radius: 20px;
+    width: 90%;
+    margin: 30px auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.form-name {
+    margin: auto;
+    color: #EA1313;
+    font-weight: 700;
+    font-size: 30px;
+    text-align: center;
+}
+
+#tap-icon {
+    width: 300px;
+    position: absolute;
+    top: 150px;
+    left: 70%;
+}
+
+.form {
+    width: 70%;
+    margin: auto;
+}
+
+.field {
+    width: 100%;
+    background-color: #EFEFEF;
+    padding: 20px;
+    margin: 15px 0px;
+}
+
+.label {
+    float: left;
+    width: 40%;
+}
+
+.btn {
+    width: 100%;
+    display: flex;
+}
+
+.form-btn {
+    margin: auto;
+    text-align: center;
+    border: 1px #707070 solid;
+    background-color: #ffffff;
+    color: #FF8484;
+    padding: 10px 15px;
+    border-radius: 25px;
+    font-size: 15px;
+    font-family: 'American Typewriter';
+}
+
+.form-btn:hover {
+    cursor: pointer;
+    border: 0;
+    background-color: #FF8484;
+    color: #ffffff;
+}
+
+input, select {
+    padding: 10px;
+    border: 1px #000000 solid;
+    border-radius: 20px;
+    outline-width: 0;
+    font-size: 15px;
+    font-family: 'American Typewriter';
+}
+
+

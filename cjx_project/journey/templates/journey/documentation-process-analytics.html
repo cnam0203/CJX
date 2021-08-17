@@ -1,0 +1,48 @@
+{% extends 'journey/base-dashboard.html' %}
+
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'journey/css/documentation.css' %}">
+    <div class="documentation-container">
+        <div class="documentation-name">Documentation - Process Analytics</div>
+        <div id="content-container">
+            <p class="header-content">1.  Visualize Journey:</p>
+            <p class="main-content">Based on imported data about touchpoints, Visualize Journey help us to generate a Process Model that describes customer behaviors through their touchpoints from the start to the end.</p>
+            <ul>
+                <li class="list-content">Step 1: Click Analytics button on the left column</li>
+                <li class="list-content">Step 2: Click Visualize Journey button</li>
+                <li class="list-content">Step 3: Choose the period that you want to observe the journey</li>
+                <li class="list-content">Step 4: Choose a Process Discovery Algorithm, each algorithm generates a distinct process model with different accuracy</li>
+                <li class="list-content">Step 5: Click Run button and wait until the algorithm finishes running</li>
+            </ul>
+            <p class="header-content">2.  Trace Clustering:</p>
+            <p class="main-content">A process model produced from the imported data will be complicated and difficult to analyze. Indeed, many trace clusters (group of journey) may share common properties, for example, group of traces where the customers complete a transaction, group of traces where the customers add products to the cart but not do any transactions,... This feature helps to discover the behavioral patterns (trace clustering) and visualize them</p>
+            <ul>
+                <li class="list-content">Step 1: Click Analytics button on the left column</li>
+                <li class="list-content">Step 2: Click Trace Clustering button</li>
+                <li class="list-content">Step 3: Choose the period that you want to observe the journey</li>
+                <li class="list-content">Step 4: Choose a Preprocessing Method (each customer has a journey - list of touchpoints, preprocessing method helps to convert journeys into equal vectors)</li>
+                <li class="list-content">Step 5: Choose a Clustering Algorithm</li>
+                <li class="list-content">Step 6: Choose the number of clusters</li>
+                <li class="list-content">Step 7: Choose a Process Discovery Algorithm that help to visualize trace clusters in form of process models</li>
+                <li class="list-content">Step 8: Click Run button and wait until the algorithm finishes running</li>
+            </ul>
+            <p class="header-content">3.  Decision Mining:</p>
+            <p class="main-content">Process Model plays an essential role in gaining insight into customer behaviors. However, the discovered process model only focuses on the activity type to reflect the control-flow perspective and therefore gives no information about how the value of a data attribute may affect the routing of a case. Decision Mining helps to detect main factors (attributes) that effect the splitting on the journey</p>
+            <ul>
+                <li class="list-content">Step 1: Click Analytics button on the left column</li>
+                <li class="list-content">Step 2: Click Decision Mining button</li>
+                <li class="list-content">Step 3: Choose the period that you want to observe the journey</li>
+                <li class="list-content">Step 4: Click Run button and wait until the algorithm finishes running</li>
+            </ul>
+        </div>
+        <div id="content-footer">
+            <div id="left-footer">
+                <a class="url" href={{ previous_href }}>&#8592; {{ previous_content }}</a>
+            </div>
+            <div id="right-footer">
+                <a class="url" href={{ next_href }}>{{ next_content }} &#8594;</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

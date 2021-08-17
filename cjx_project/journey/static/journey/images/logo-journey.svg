@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="787" height="247" viewBox="0 0 787 247">
+  <g id="Group_5" data-name="Group 5" transform="translate(-1048 -527)">
+    <g id="Group_4" data-name="Group 4" transform="translate(-14 -8)">
+      <g id="Group_3" data-name="Group 3" transform="translate(1062 535)">
+        <g id="Ellipse_1" data-name="Ellipse 1" transform="translate(0 164)" fill="none" stroke="#e35050" stroke-width="20">
+          <circle cx="41.5" cy="41.5" r="41.5" stroke="none"/>
+          <circle cx="41.5" cy="41.5" r="31.5" fill="none"/>
+        </g>
+        <line id="Line_1" data-name="Line 1" y1="63.226" x2="28.164" transform="translate(57.469 108.468)" fill="none" stroke="#e35050" stroke-width="30"/>
+        <path id="Path_1" data-name="Path 1" d="M0,0,24.715,24.695,35.948,35.92" transform="translate(125.136 97.742)" fill="none" stroke="#e35050" stroke-width="30"/>
+        <line id="Line_3" data-name="Line 3" y1="53.975" x2="32.177" transform="translate(201.886 74.215)" fill="none" stroke="#e35050" stroke-width="30"/>
+        <g id="Ellipse_5" data-name="Ellipse 5" transform="translate(57 32)" fill="none" stroke="#e35050" stroke-width="20">
+          <circle cx="41.5" cy="41.5" r="41.5" stroke="none"/>
+          <circle cx="41.5" cy="41.5" r="31.5" fill="none"/>
+        </g>
+        <g id="Ellipse_6" data-name="Ellipse 6" transform="translate(143 119)" fill="none" stroke="#e35050" stroke-width="20">
+          <circle cx="41.5" cy="41.5" r="41.5" stroke="none"/>
+          <circle cx="41.5" cy="41.5" r="31.5" fill="none"/>
+        </g>
+        <g id="Ellipse_7" data-name="Ellipse 7" transform="translate(211)" fill="none" stroke="#e35050" stroke-width="20">
+          <circle cx="41.5" cy="41.5" r="41.5" stroke="none"/>
+          <circle cx="41.5" cy="41.5" r="31.5" fill="none"/>
+        </g>
+      </g>
+    </g>
+    <path id="Path_2" data-name="Path 2" d="M0,0V247" transform="translate(1396.5 527)" fill="none" stroke="#393838" stroke-width="20"/>
+    <text id="journey" transform="translate(1451 547)" fill="#3e3a3a" font-size="90" font-family="AmericanTypewriter-Semibold, American Typewriter" font-weight="600"><tspan x="0" y="81">journey</tspan></text>
+    <text id="master" transform="translate(1438 634)" fill="#f06969" font-size="90" font-family="AmericanTypewriter, American Typewriter"><tspan x="24.365" y="81">master</tspan></text>
+  </g>
+</svg>

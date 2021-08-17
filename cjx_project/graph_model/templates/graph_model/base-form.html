@@ -1,0 +1,26 @@
+{% extends 'journey/base-dashboard.html' %}
+
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'graph_model/css/base-form.css' %}">
+    <div class="form-container">
+        <div class="form-name">{{ formName }}</div>
+        <img src="{% static '/journey/images/tap.svg' %}" id="tap-icon"/>
+        <form action="" method="POST" class="form">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="field">
+                    <label for="{{ field.id_for_label }}" class="label">
+                        {{ field.html_name }}
+                    </label>
+                    {{ field }}
+                </div>
+            {% endfor %}
+            <div class="btn">
+                {% if formName == 'Form clustered_journey_graph' %}
+                    <button type="sumbit" class="form-btn">Save</button>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+{% endblock %}

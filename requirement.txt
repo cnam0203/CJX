@@ -1,0 +1,9 @@
+django
+pymysql
+pm4py
+numpy
+sklearn
+pandas
+kmodes
+django-datetimepicker
+django-user-agents

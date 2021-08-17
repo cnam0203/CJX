@@ -1,0 +1,26 @@
+{% extends 'journey/base-dashboard.html' %}
+
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'journey/css/documentation.css' %}">
+    <div class="documentation-container">
+        <div class="documentation-name">Documentation - Reports</div>
+        <div id="content-container">
+            <p class="header-content">Reports</p>
+            <p class="main-content">Customer Journey Master supports businesses to track daily reports related to the number of new customers, the number of customers interacting with the company, customer behavior based on their device category, operating system, browser, time, geo-location.</p>
+            <ul>
+                <li class="list-content">Click Report button on the left column</li>
+                <li class="list-content">Choose a daily report</li>
+                <li class="list-content">Choose the period for report</li>
+            </ul>
+        </div>
+        <div id="content-footer">
+            <div id="left-footer">
+                <a class="url" href={{ previous_href }}>&#8592; {{ previous_content }}</a>
+            </div>
+            <div id="right-footer">
+                <a class="url" href={{ next_href }}>{{ next_content }} &#8594;</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

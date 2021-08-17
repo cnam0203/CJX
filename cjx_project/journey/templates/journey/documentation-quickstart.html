@@ -1,0 +1,33 @@
+{% extends 'journey/base-dashboard.html' %}
+
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'journey/css/documentation.css' %}">
+    <div class="documentation-container">
+        <div class="documentation-name">Documentation - QuickStart</div>
+        <div id="content-container">
+            <p class="header-content">1.  Customer Journey:</p>
+            <ul>
+                <li class="list-content">The customer journey is the complete sum of experiences that customers go through when interacting with your company and brand. A journey consists of a sequential sequence of touchpoints. A touchpoint is defined as an interaction between the customer and the company through a particular channel, in a particular period. To describe the content of a touchpoint, we have an action.</li>
+                <li class="list-content">For example, a customer made a transaction to buy a ball from 3:00 pm to 3:02 pm through an official website of the company. In this example, the process when the customer interacts with the company (from 3:00 pm to 3:02 pm) is considered a touchpoint, while the website is supposed to be the channel where the touchpoint took place. In this example, the action of this touchpoint is “buy” or “make a transaction”</li>
+            </ul>
+            </br>
+            <p class="header-content">2.  Customer Journey Master:</p>
+            <p class="main-content">Journey Master is a customer journey management system implemented based on the process mining framework. Using the information extracted from the company’s event log, the Journey Master system provides 2 main central features:</p>
+            <ul>
+                <li class="list-content">Mapping, modeling, and visualize the journey</li>
+                <li class="list-content">Clustering the journeys based on their similarities, which helps statist view the main flow of the customer’s intention.</li>
+                <li class="list-content">Determine decision factors influencing customer journey</li>
+                <li class="list-content">Making daily reports: action, device, geo-network, channel, ...</li>
+            </ul>
+        </div>
+        <div id="content-footer">
+            <div id="left-footer">
+                <a class="url" href={{ previous_href }}>&#8592; {{ previous_content }}</a>
+            </div>
+            <div id="right-footer">
+                <a class="url" href={{ next_href }}>{{ next_content }} &#8594;</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

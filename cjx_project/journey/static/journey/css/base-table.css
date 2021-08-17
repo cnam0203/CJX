@@ -1,0 +1,123 @@
+.table-container {
+    box-shadow: 0px 4px 3px #d1d1d1;
+    background-color: #ffffff;
+    border-radius: 20px;
+    width: 90%;
+    margin: 30px auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.table-name {
+    margin: auto;
+    color: #EA1313;
+    font-weight: 500;
+    font-size: 30px;
+}
+
+.table-configure {
+    display: grid;
+    grid-auto-columns: 1fr;
+    margin: 30px 0px;
+}
+
+.configure {
+    grid-row: 1;
+    position: relative;
+}
+
+.add-btn:hover {
+    border-bottom: 1px #EA1313 solid;
+}
+
+.search-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 40px;
+    border: 1px #707070 solid;
+    border-radius: 40px;
+    padding: 15px 10px;
+    vertical-align: middle;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.search-btn {
+    float: right;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    vertical-align: middle;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.search-btn > img {
+    width: 20px;
+}
+
+.search-txt {
+    border: 0px;
+    font-family: 'American Typewriter';
+    font-size: 20px;
+    font-weight: 350;
+}
+
+.search-txt {
+    outline-width: 0;
+}
+
+.configure > a {
+    font-size: 20px;
+    text-decoration: none;
+    color: #F04444;
+}
+
+.table-content {
+    width: 100%;
+    overflow-x: scroll;
+    text-align: center;
+    font-family: 'Avenir';
+}
+
+.table-header {
+    margin: auto;
+    margin-bottom: 15px;
+    width: 100%;
+    display: flex;
+}
+
+.header-field {
+    font-weight: 400;
+    padding: 5px;
+    flex: 0 0 150px;
+    border-bottom: 1px #707070 solid;
+    overflow-x: scroll;
+    font-family: 'Avenir';
+}
+
+.table-row {
+    margin: auto;
+    margin-bottom: 5px;
+    display: flex;
+}
+
+.table-column {
+    border-bottom: 1px #707070 solid;
+    flex: 0 0 150px;
+    padding: 5px;
+    font-weight: 100;
+    font-family: 'Avenir';
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+    color: #707070;
+    overflow-wrap: break-word;
+    font-family: 'Avenir';
+}
+

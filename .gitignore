@@ -102,7 +102,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/
@@ -131,9 +130,13 @@ dmypy.json
 
 # CJX
 **/migrations
-*.DS_Store
 **/__pycache__
-**/.DS_Store
 
 *.png
 *.sav
+*.gv
+
+node_modules/
+.enslintrc.js
+package-lock.json
+package.json

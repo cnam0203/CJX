@@ -1,0 +1,63 @@
+{% extends 'journey/base-dashboard.html' %}
+
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'journey/css/mapping-file.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <div class="create-container" data-aos="fade-up">
+        <div class="table-name">Create Matching File</div>
+        <div class="table-configure">
+            <div class="configure"></div>
+            <div class="center-configure">
+                <div class="filename-box">
+                    <div style="width: 100%; display: flex; margin-bottom: 10px">
+                        <label class="filename">Filename</label>
+                        <input type="text" id="data-source-name" value='' class="filename-txt"/>
+                    </div>
+                    <div style="width: 100%; display: flex">
+                        <label class="filename">Example</label>
+                        <input type="file" id="upload-instruction" accept=".png, .jpg, .jpeg" class="filename-txt"/>
+                    </div>
+                </div>
+            </div>
+            <div class="configure">
+                <button type="submit" 
+                        class="form-btn" 
+                        id="submit-create" 
+                        onclick="submitMappingFile({{ reports }}, {{ fields }});">Save</button>
+            </div>
+        </div>
+        <img src="{% static '/journey/images/mind-mapping.svg' %}" id="tap-icon"/>
+        <div class="mapping-table">
+            <div class="table-header">
+                <div class="header-file">Touchpoint field</div>
+                <div class="header-file">Column name</div>
+                <div class="header-file">Function</div>
+            </div>
+            {% for field in fields %}
+                <div class="table-row">
+                    <div class="table-column">{{ field }}</div>
+                    <div class="table-column">
+                        <input type="text" class="input-field" id='report-column-{{ field }}'/>
+                    </div>
+                    <div class="table-column">
+                        <select class="select-input" id="instruction-{{ field }}">
+                            <option class="select-choice" value="">Choose a function</option>
+                            {% for function in functions %}
+                                <option class="select-choice" value={{ function }}>{{ function }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% load static %}  
+        <script src="{% static '/journey/js/utils.js' %}" type="text/javascript"></script> 
+        <script src="{% static '/journey/js/create-mapping-file.js' %}" type="text/javascript"></script> 
+    <script>
+        AOS.init({duration: 1500,});
+    </script>
+{% endblock %}

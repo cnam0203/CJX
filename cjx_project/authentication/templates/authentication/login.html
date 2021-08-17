@@ -1,0 +1,41 @@
+{% extends 'journey/index.html' %}
+
+{% block container %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'authentication/css/login.css' %}">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <script  type="text/javascript" src="{% static '/authentication/js/login.js' %}"></script> 
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <div class="column" id="column-left">
+        <img src="{% static '/authentication/images/logo-white.svg' %}" 
+                class="center" 
+                id="img-logo"
+                data-aos="fade-right"/>
+    </div>
+    <div class="column" id="column-right">
+        <div class="center" id="login-box" data-aos="fade-left">
+            <p id="logo-txt">Login</p>
+            <form action="/authentication/login" method="post">
+                {% csrf_token %}
+                <input type='text' 
+                        name='username' 
+                        placeholder="Username" 
+                        class="input-login" 
+                        id="input-username" 
+                        required=true
+                        maxlength="15"/>
+                <input type='password' 
+                        name='password' 
+                        placeholder="Password" 
+                        class="input-login" 
+                        id="input-password"  
+                        required=true
+                        maxlength="15"/>
+                <button class="input-submit">Log In</button>
+            </form> 
+        </div>
+    </div>
+    <script>
+        AOS.init({duration: 1500,});
+    </script>
+{% endblock %}

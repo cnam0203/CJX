@@ -1,0 +1,167 @@
+{% extends 'journey/base-dashboard.html' %}
+
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'journey/css/report.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <div class="create-container" data-aos="fade-up">
+        <div class="table-name">Daily Report</div>
+        <form class="configuration" action="/admin/journey/report" method="post" name="form" onsubmit="return validateForm()" id="form" >
+            {% csrf_token %}
+            <div class="center-configure">
+                <div class="configure-txt overflow-txt">Configuration</div>
+                <div class="configure-container">
+                    <div class="select-container">
+                        <label class="select-label">Data Source</label>
+                        <select id="mining-algorithm" name="dataSource" class="select-input">
+                            <option value= {{ 'all' }}>All</option>
+                            {% for source in data_sources%}
+                                <option value= {{ source.id }}>{{ source.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="select-container">
+                        <label class="select-label">From</label>
+                        <input type="date" name="startDate" class="select-input"/>
+                    </div>
+                    <div class="select-container">
+                        <label class="select-label">To</label>
+                        <input type="date" name="endDate" class="select-input"/>
+                    </div>
+                </div>
+            </div>
+            <div class="configure-btn">
+                <button type="submit" class="run-btn">Get Report</button>
+            </div>
+        </form>
+        <div id="chart-container">
+        </div>
+    </div>
+    {% load static %}  
+        <script src="{% static '/journey/js/utils.js' %}" type="text/javascript"></script> 
+        <script src="{% static '/journey/js/report.js' %}" type="text/javascript"></script> 
+    <script>
+        var data = JSON.parse("{{reports|escapejs}}");
+        var container = document.getElementById("chart-container");
+
+        data.map((chart, index) => {
+            var containerName = "container" + index.toString();
+            var newChildDiv = document.createElement("div");
+            var newParentDiv = document.createElement("div");
+
+            newChildDiv.id = containerName;
+            newParentDiv.classList.add("chart");
+
+            newParentDiv.appendChild(newChildDiv)
+            container.appendChild(newChildDiv);
+
+            if (chart.type == 1) {
+                Highcharts.chart(containerName, {
+                    chart: {
+                        type: 'column'
+                    },
+                    title: {
+                        text: chart.title
+                    },
+                    xAxis: {
+                        type: 'category'
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Total Number'
+                        }
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    plotOptions: {
+                        series: {
+                            borderWidth: 0,
+                            dataLabels: {
+                                enabled: true,
+                            },
+                            showInLegend: true
+                        }
+                    },
+                    series: [
+                        {
+                            name: "",
+                            colorByPoint: true,
+                            data: chart.data
+                        }
+                    ],
+                    exporting: {
+                        enabled: true
+                    }
+                })
+            } else {
+                var xCategories = chart.data.map(row => row[0]).filter((x, i, a) => a.indexOf(x) === i)
+                var yCategories = chart.data.map(row => row[2]).filter((x, i, a) => a.indexOf(x) === i)
+                var dict = {}
+                var series = []
+
+                yCategories.map(category => {
+                    dict[category] = new Array(xCategories.length).fill(0);
+                })
+
+                dict['total'] = new Array(xCategories.length).fill(0);
+
+                chart.data.map(row => {
+                    xIndex = xCategories.indexOf(row[0])
+                    dict[row[2]][xIndex] = row[1]
+                    dict['total'][xIndex] += row[1]
+                })
+
+                for (const category in dict) {
+                    let type = ''
+
+                    if (category == 'total')
+                        type = 'line'
+
+                    series.push({
+                        name: category,
+                        type: type,
+                        data: dict[category]
+                    })
+                }
+
+                Highcharts.chart(containerName, {
+                    chart: {
+                        type: 'column'
+                    },
+                    title: {
+                        text: chart.title
+                    },
+                    xAxis: {
+                        categories: xCategories
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: 'Total Touchpoint'
+                        },
+                    },
+                    tooltip: {
+                        headerFormat: '<b>{point.x}</b><br/>',
+                        pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+                    },
+                    plotOptions: {
+                        column: {
+                            stacking: 'normal'
+                        }
+                    },
+                    series: series
+                });
+            }
+        })
+    </script>
+    <script>
+        AOS.init({duration: 1500,});
+    </script>
+{% endblock %}

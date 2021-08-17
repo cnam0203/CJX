@@ -1,0 +1,85 @@
+{% extends 'journey/base-dashboard.html' %}
+
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'graph_model/css/configure.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <script src="{% static '/graph_model/js/index.js' %}" type="text/javascript"></script>
+    <script>
+        var result = "{{result}}";
+        if (result) {
+            alert(result)
+        }
+    </script>
+    <div class="visualize-container" data-aos="fade-up">
+        <div class="title">Decision Mining</div>
+        <form action="/admin/graph_model/get-decision-graph" method="post" name="decisionForm" class="configuration" id="decisionForm" onsubmit="return validateDecisionForm()">
+            {% csrf_token %}
+            <div class="center-configure">
+                <div class="configure-txt overflow-txt">Configuration</div>
+                <div class="configure-container">
+                    <div class="select-container">
+                        <label class="select-label">Data Source</label>
+                        <select id="mining-algorithm" name="data-source" class="select-input">
+                            <option value= {{ 'all' }}>All</option>
+                            {% for source in data_sources%}
+                                <option value= {{ source.id }}>{{ source.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="select-container">
+                        <label class="select-label">Date From</label>
+                        <input type="date" name="startDate" class="select-input"/>
+                    </div>
+                    <div class="select-container">
+                        <label class="select-label">Date To</label>
+                        <input type="date" name="endDate" class="select-input"/>
+                    </div>
+                </div>
+            </div>
+            <div class="configure">
+                <button type="submit" class="run-btn">Run</button>
+            </div>
+        </form>
+        <img src="{% static '/graph_model/images/decision.svg' %}" id="decision-icon"/>
+        {% if graphLinks %}
+        <div class="result">
+            <div class="result-txt overflow-txt">Results</div>
+            <div class="result-container">
+                <div style="width: 100%">
+                    <div style="width:100%, text-align:left">
+                        <h1>Process Graph</h1>
+                    </div>
+                    <div style="overflow-x:auto;">  
+                        <img src="{% static processGraph %}" alt="My image">
+                    </div>
+                    <br/>
+                    <br/>
+                </div>
+                <div style="width: 100%">
+                    <div style="width:100%, text-align:left">
+                        <h1>Full Decision Process Graph</h1>
+                    </div>
+                    <div style="overflow-x:auto;">  
+                        <img src="{% static decisionGraph %}" alt="My image">
+                    </div>
+                    <br/>
+                    <br/>
+                </div>
+                {% for graphLink in graphLinks %}
+                    <div style="width: 100%">
+                        <div style="width:100%, text-align:left">
+                            <h1>Action {{ forloop.counter }}</h1>
+                        </div>
+                        <div style="overflow-x:auto;">  
+                            <img src="{% static graphLink %}" alt="My image">
+                        </div>
+                        <br/>
+                        <br/>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}
