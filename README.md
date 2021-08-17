@@ -62,7 +62,7 @@ Customer Journey Master is a Web Management Application written by Python's Djan
   ### Other system
    1. Import data by Restful API endpoint
   
- ### How to deploy system on cloud services
+ ## How to deploy system on cloud services
    1. Amazon Web Service
    
    2. Configuration
