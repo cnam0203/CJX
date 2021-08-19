@@ -66,9 +66,10 @@ Customer Journey Master is a Web Management Application written by Python's Djan
    3. Configuration
 
       - First, Go the the cjx_project folder.
-      - Configure information relating to database server, in '.env' file:
+      - Configure information relating to database server, in 'cjx_project/settings.py' file:
       
-        <img width="296" alt="Screen Shot 2021-08-19 at 12 32 42" src="https://user-images.githubusercontent.com/47789251/130013466-13e9cc17-c4da-470e-b9b7-e81af8d8763b.png">
+        <img width="384" alt="Screen Shot 2021-08-19 at 13 05 22" src="https://user-images.githubusercontent.com/47789251/130016448-a710145c-1d23-410c-987a-a3154a423a78.png">
+
 
       
       - Migrate pre-defined tables (admin, permission, session, etc.) into database
