@@ -18,18 +18,28 @@ Customer Journey Master is a Web Management Application written by Python's Djan
    1. Python
    
         - Django is a Python web framework, so, we have to download python on the machine, so that we can run the server. We recommend downloading Python version from 3.x.x .
+        <img width="798" alt="Screen Shot 2021-08-19 at 12 35 10" src="https://user-images.githubusercontent.com/47789251/130013579-00b9af10-1f52-4dc8-95fc-2aed8973b9e1.png">
+
    2. Database (MySQL)
     
         - The system needs a database management system to store customer data, so it needs to install a DBMS. The source code of this system, currently supports MySQL, so we recommend you to install MySQL. However, you can still load other DBMS systems (PostgreSQL, SQL Server, ...), and then need to reconfigure the database engine in the project's settings.py file, to enable the connection between backend server and database server.
+
+        <img width="888" alt="Screen Shot 2021-08-19 at 12 36 23" src="https://user-images.githubusercontent.com/47789251/130013674-e44eac99-002b-4ce9-9054-c661f8572960.png">
         
         - Once installed, you need to create a database, name it and save the database account information: hostname, port, username, password and database name.
     
    3. Pip
    
         - A package manager for Python.
+        
+        <img width="843" alt="Screen Shot 2021-08-19 at 12 37 11" src="https://user-images.githubusercontent.com/47789251/130013761-0d44f686-68ce-4256-abaf-6820e5e0bc9e.png">
+
    4. Virtual environment 
       
         - A tool to create isolated Python environments. A Python environment such that the interpreter, packages, libraries, and scripts installed into it are isolated from those installed in the global environment of the system. It also allows installing packages without administrator privileges. Django package, the process mining library will be stored in the directory of the virtual environment.
+
+      <img width="895" alt="Screen Shot 2021-08-19 at 12 37 42" src="https://user-images.githubusercontent.com/47789251/130013803-f3c2ccd9-9f66-45d9-bd08-d21e5ec944fb.png">
+
       
   ### Main steps
    1. Clone source code
