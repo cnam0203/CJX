@@ -72,10 +72,7 @@ Customer Journey Master is a Web Management Application written by Python's Djan
         
         <img width="475" alt="Capture d’écran, le 2022-03-15 à 08 30 20" src="https://user-images.githubusercontent.com/47789251/158377998-8ea7118b-8675-41bb-8a06-ca0eca487ffa.png">
 
-      - Makemigrations pre-defined tables in apps journey, graph_model, company_items into database:
-          . python manage.py makemigrations journey
-          . python manage.py makemigrations graph_model
-          . python manage.py makemigrations company_items
+      - Makemigrations pre-defined tables in apps journey, graph_model, company_items into database: python manage.py makemigrations journey, python manage.py makemigrations graph_model, python manage.py makemigrations company_items
           
       - Migrate pre-defined tables (admin, permission, session, etc.) into database
       
