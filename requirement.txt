@@ -8,4 +8,4 @@ kmodes
 django-datetimepicker
 django-user-agents
 jwt
-dotenv
+python-dotenv
