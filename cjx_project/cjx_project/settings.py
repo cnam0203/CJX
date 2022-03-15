@@ -95,11 +95,11 @@ WSGI_APPLICATION = 'cjx_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': ''
+        'NAME': 'cjx',
+        'USER': 'root',
+        'PASSWORD': 'cnam0203',
+        'HOST': 'localhost',
+        'PORT': '3306'
     },
 }
 

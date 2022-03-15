@@ -6,7 +6,6 @@ from django.db import Error, DataError, DatabaseError, IntegrityError
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.contrib.gis.geoip2 import GeoIP2
 from django.db.models import Count
 from django.db.models import F
 from django.db.models.functions import TruncDate
@@ -533,48 +532,6 @@ def review_mapping_file(request, reportId=None):
                     }
                 )
 
-
-@csrf_exempt
-def import_touchpoint_api(req):
-    if (req.method == 'POST'):
-        headers = req.headers
-        message = ''
-        # Check api_access_token
-        if ('Authorization' in headers):
-            api_token = headers['Authorization'].split(' ')[1]
-            tokens = list(API_KEY.objects.filter(key=api_token))
-
-            # If access_token is valid
-            if (len(tokens) > 0):
-                if (req.body):
-                    # Load data in request body
-                    body = json.loads(req.body)
-                    data = body['data']
-                    # Find device info based on http request
-                    data = track_device_info(req, data)
-                    # Find geo network based on http request
-                    data = track_geo_info(req, data)
-                    # Find time
-                    data = add_time(req, data)
-
-                    # Check touchpoint is valid
-                    new_touchpoint = create_valid_touchpoint(data)
-                    if (new_touchpoint):
-                        new_touchpoint.save()
-                        return JsonResponse({'status': 200, 'message': 'Add new touchpoint successfully'})
-                    else:
-                        message = 'Import touchpoint may be wrong format'
-                else:
-                    message = 'Require data in body'
-            else:
-                message = 'Authentication failed'
-        else:
-            message = 'Require API Token'
-    else:
-        message = 'HTTP method is wrong'
-    
-    return JsonResponse({'status': 400, 'message': message})
-
 def get_total_user_chart(startDate, endDate, dataSource):
     print(dataSource)
 
@@ -635,19 +592,6 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
-
-def track_geo_info(request, data):
-    ip  = get_client_ip(request)
-    g   = GeoIP2()
-    try:
-        geolocation             = g.city(ip)
-        data['geo_continent']   = geolocation['time_zone']
-        data['geo_country']     = geolocation['country_name']
-        data['geo_city']        = geolocation['city']
-    except:
-        pass
-
-    return data
 
 def add_time(request, data):
     data['time'] = datetime.now()

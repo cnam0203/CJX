@@ -22,5 +22,4 @@ urlpatterns = [
     path('import/create-mapping-file', views.get_create_mapping_file),
     path('import/review-mapping-file', views.review_mapping_file),
     path('import/review-mapping-file/<reportId>', views.review_mapping_file),
-    path('import/import-touchpoint-api', views.import_touchpoint_api),
 ]

@@ -142,11 +142,11 @@ class Matching_Column(models.Model):
 
 
 class Data_Source_Permission(models.Model):
-    users = [(user.id, user.username) for user in list(User.objects.all())]
-    data_sources = [(source.id, source.name) for source in list(Data_Source.objects.filter(is_public=True))]
+    # users = [(user.id, user.username) for user in list(User.objects.all())]
+    # data_sources = [(source.id, source.name) for source in list(Data_Source.objects.filter(is_public=True))]
 
-    data_source = models.IntegerField(choices=data_sources)
-    user = models.IntegerField(choices=users)
+    data_source = models.IntegerField()
+    user = models.IntegerField()
     class Meta:
         unique_together = (("data_source", "user"),)
 
